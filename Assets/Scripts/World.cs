@@ -64,8 +64,6 @@ public class World : MonoBehaviour
         ChunkCoord coord = GetChunkCoordFromVector3(player.position);
         playerLastChunkCoord = coord;
         List<ChunkCoord> previouslyActiveChunks = new List<ChunkCoord>(activeChunks);
-        
-        //activeChunks.Clear();
         for (int x = coord.x - VoxelData.ViewDistanceInChunks; x < coord.x + VoxelData.ViewDistanceInChunks; x++)
         {
             for (int z = coord.z - VoxelData.ViewDistanceInChunks; z < coord.z + VoxelData.ViewDistanceInChunks; z++)

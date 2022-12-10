@@ -173,10 +173,11 @@ public class Chunk
             if (chunkObject == null)
                 Debug.LogError($"Chunk ({coord.x}, {coord.z})'s {nameof(isActive)} property was accessed (write) while the chunkObject was null");
 #endif
-            if (!world.activeChunks.Contains(this.coord) && value)
-                world.activeChunks.Add(this.coord);
-            else if (world.activeChunks.Contains(this.coord) && !value)
+            //TODO: This will most likely need a threadlock (lock) on the adding/removing for enumerator iteration in other threads.
+            if (!value && world.activeChunks.Contains(this.coord))
                 world.activeChunks.Remove(this.coord);
+            else if (value && !world.activeChunks.Contains(this.coord))
+                world.activeChunks.Add(this.coord);
             chunkObject.SetActive(value);
         }
     }
