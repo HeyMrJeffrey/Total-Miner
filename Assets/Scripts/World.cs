@@ -10,7 +10,7 @@ public class World : MonoBehaviour
     public BlockType[] blockTypes;
     Chunk[,] chunkMap = new Chunk[VoxelData.WorldSizeInChunks, VoxelData.WorldSizeInChunks];
 
-    List<ChunkCoord> activeChunks = new List<ChunkCoord>();
+    public List<ChunkCoord> activeChunks = new List<ChunkCoord>();
     ChunkCoord playerChunkCoord;
     ChunkCoord playerLastChunkCoord;
 
@@ -24,6 +24,7 @@ public class World : MonoBehaviour
         GenerateWorld();
 
         playerLastChunkCoord = GetChunkCoordFromVector3(player.position);
+        CheckViewDistance(); //temporary, just spawn immediate chunks instead, this is very hacky way of getting the initial chunks to load when the game starts
     }
 
     private void Update()
@@ -63,7 +64,8 @@ public class World : MonoBehaviour
         ChunkCoord coord = GetChunkCoordFromVector3(player.position);
         playerLastChunkCoord = coord;
         List<ChunkCoord> previouslyActiveChunks = new List<ChunkCoord>(activeChunks);
-
+        
+        //activeChunks.Clear();
         for (int x = coord.x - VoxelData.ViewDistanceInChunks; x < coord.x + VoxelData.ViewDistanceInChunks; x++)
         {
             for (int z = coord.z - VoxelData.ViewDistanceInChunks; z < coord.z + VoxelData.ViewDistanceInChunks; z++)
@@ -71,14 +73,9 @@ public class World : MonoBehaviour
                 if (IsChunkInWorld(new ChunkCoord(x, z)))
                 {
                     if (chunkMap[x, z] == null)
-                    {
                         CreateNewChunk(x, z);
-                    }
-                    else if (!chunkMap[x,z].isActive)
-                    {
-                        chunkMap[x, z].isActive = true;
-                        activeChunks.Add(new ChunkCoord(x,z));     
-                    }
+                    if (!chunkMap[x,z].isActive)
+                        chunkMap[x, z].isActive = true;   
                 }
 
                 for (int i = 0; i < previouslyActiveChunks.Count; i++)
@@ -141,7 +138,7 @@ public class World : MonoBehaviour
     void CreateNewChunk(int x, int z)
     {
         chunkMap[x, z] = new Chunk(new ChunkCoord(x, z), this);
-        activeChunks.Add(new ChunkCoord(x,z));
+        //activeChunks.Add(new ChunkCoord(x,z));
     }
 
     bool IsChunkInWorld(ChunkCoord coord)

@@ -27,7 +27,10 @@ public class Chunk
     {
         coord = _coord;
         world = _world;
+        
         chunkObject = new GameObject();
+        isActive = false;
+
         meshFilter = chunkObject.AddComponent<MeshFilter>();
         meshRenderer = chunkObject.AddComponent<MeshRenderer>();
         meshRenderer.material = world.material;
@@ -36,7 +39,6 @@ public class Chunk
                                                      0f,
                                                      coord.z * VoxelData.ChunkWidth);
         chunkObject.name = "Chunk: " + coord.x + "," + coord.z;
-
         PopulateVoxelMap();
         CreateMeshData();
         CreateMesh();
@@ -157,8 +159,26 @@ public class Chunk
 
     public bool isActive
     {
-        get { return chunkObject.activeSelf; }
-        set { chunkObject.SetActive(value); }
+        get
+        {
+#if DEBUG
+            if (chunkObject == null)
+                Debug.LogError($"Chunk ({coord.x}, {coord.z})'s {nameof(isActive)} property was accessed (read) while the chunkObject was null");
+#endif
+            return chunkObject.activeSelf;
+        }
+        set
+        {
+#if DEBUG
+            if (chunkObject == null)
+                Debug.LogError($"Chunk ({coord.x}, {coord.z})'s {nameof(isActive)} property was accessed (write) while the chunkObject was null");
+#endif
+            if (!world.activeChunks.Contains(this.coord) && value)
+                world.activeChunks.Add(this.coord);
+            else if (world.activeChunks.Contains(this.coord) && !value)
+                world.activeChunks.Remove(this.coord);
+            chunkObject.SetActive(value);
+        }
     }
 
     // Allows us to get data within a chunk
@@ -204,7 +224,7 @@ public class ChunkCoord
 
     public bool Equals(ChunkCoord coordToCompare)
     {
-        if(coordToCompare == null)
+        if (coordToCompare == null)
         {
             return false;
         }
