@@ -120,13 +120,13 @@ public class World : MonoBehaviour
         /* IMMUTABLE PASS */
         // If the current voxel is not in the world, just make it air.
 
+        //If outside the world, return an air block.
         if (!IsVoxelInWorld(pos))
             return 0;
 
-
         //If bottom block of chunk, return bedrock
         if (yPos == 0)
-            return 1; //Bedrock
+            return 1;
 
 
         /* BASIC TERRAIN PASS */
@@ -176,15 +176,14 @@ public class World : MonoBehaviour
     void CreateNewChunk(int x, int z)
     {
         chunkMap[x, z] = new Chunk(new ChunkCoord(x, z), this);
-        //activeChunks.Add(new ChunkCoord(x,z));
     }
 
     bool IsChunkInWorld(ChunkCoord coord)
     {
-        if (coord.x > 0 && coord.x < VoxelData.WorldSizeInChunks - 1 &&
-           coord.z > 0 && coord.z < VoxelData.WorldSizeInChunks - 1)
+        if (coord.x >= 0 && coord.x < VoxelData.WorldSizeInChunks &&
+           coord.z >= 0 && coord.z < VoxelData.WorldSizeInChunks)
         {
-            return true;
+            return true; 
         }
         else
         {
