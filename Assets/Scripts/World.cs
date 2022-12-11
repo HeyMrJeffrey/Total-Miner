@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class World : MonoBehaviour
 {
+    public int seed;
+    public BiomeAttributes biome;
+
     public Transform player;
     public Vector3 spawnPosition;
     public Material material;
@@ -16,8 +19,10 @@ public class World : MonoBehaviour
 
     private void Start()
     {
+        Random.InitState(seed);
+
         spawnPosition = new Vector3(
-                            (VoxelData.WorldSizeInChunks*VoxelData.ChunkWidth) / 2f,
+                            (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f,
                             VoxelData.ChunkHeight + 2f,
                             (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f
                             );
@@ -70,15 +75,16 @@ public class World : MonoBehaviour
             {
                 if (IsChunkInWorld(new ChunkCoord(x, z)))
                 {
+                    //If the chunk hasn't been created at all, then let's create it.
                     if (chunkMap[x, z] == null)
                         CreateNewChunk(x, z);
-                    if (!chunkMap[x,z].isActive)
-                        chunkMap[x, z].isActive = true;   
+                    //We now know that the chunk has been created / it exists.  Now we know it's within the view distance, so we activate it.
+                    chunkMap[x, z].isActive = true; //This adds this chunkcoord the world.activeChunks list
                 }
 
                 for (int i = 0; i < previouslyActiveChunks.Count; i++)
                 {
-                    if (previouslyActiveChunks[i].Equals(new ChunkCoord(x,z)))
+                    if (previouslyActiveChunks[i].Equals(new ChunkCoord(x, z)))
                     {
                         previouslyActiveChunks.RemoveAt(i);
                     }
@@ -98,38 +104,72 @@ public class World : MonoBehaviour
     // Input a position and it returns a Voxel ID
     public byte GetVoxel(Vector3 pos)
     {
+        /* BLOCK TYPES
+        0 = Air
+        1 = Bedrock
+        2 = Stone
+        3 = Grass
+        4 = Dirt
+        5 = Furnace
+        6 = Sand
+        7 = Dirt
+        */
+
+        int yPos = Mathf.FloorToInt(pos.y);
+
+        /* IMMUTABLE PASS */
         // If the current voxel is not in the world, just make it air.
+
         if (!IsVoxelInWorld(pos))
-        {
             return 0;
+
+
+        //If bottom block of chunk, return bedrock
+        if (yPos == 0)
+            return 1; //Bedrock
+
+
+        /* BASIC TERRAIN PASS */
+
+        int terrainHeight = Mathf.FloorToInt(biome.TerrainHeight * Noise.Get2DPerlin(new Vector2(pos.x, pos.z), 0, biome.TerrainScale)) + biome.SolidGroundHeight;
+        byte voxelValue = 0;
+
+
+        if (yPos == terrainHeight)
+            voxelValue = 3; //Grass
+        else if (yPos < terrainHeight && yPos > terrainHeight - 4)
+            voxelValue = 7; //Dirt
+        else if (yPos > terrainHeight)
+            return 0; //Air
+        else
+            voxelValue = 2; //Stone'
+
+
+        /* SECOND PASS */
+
+        if (voxelValue == 2) //if Stone
+        {
+            foreach (Lode lode in biome.Lodes)
+            {
+                if (yPos > lode.minHeight && yPos < lode.maxHeight)
+                {
+                    if (Noise.Get3DPerlin(pos, lode.noiseOffset, lode.scale, lode.threshhold))
+                    {
+                        voxelValue = lode.blockID;
+                    }
+                }
+            }
         }
 
-        if (pos.y < 1)
-        {
-            return 1;
-        }
-        else if (pos.y == VoxelData.ChunkHeight - 1)
-        {
-            return 3;
-        }
-        else
-        {
-            return 2;
-        }
+        return voxelValue;
     }
 
-    bool IsVoxelInWorld(Vector3 pos)
+    public bool IsVoxelInWorld(Vector3 pos)
     {
-        if (pos.x >= 0 && pos.x < VoxelData.WorldSizeInVoxels &&
-            pos.y >= 0 && pos.y < VoxelData.ChunkHeight &&
-            pos.z >= 0 && pos.z < VoxelData.WorldSizeInVoxels)
-        {
+        if (pos.x >= 0 && pos.x < VoxelData.WorldSizeInVoxels && pos.y >= 0 && pos.y < VoxelData.ChunkHeight && pos.z >= 0 && pos.z < VoxelData.WorldSizeInVoxels)
             return true;
-        }
         else
-        {
             return false;
-        }
     }
 
     // Create a new chunk @x,z and store it in a chunk map

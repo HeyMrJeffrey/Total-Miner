@@ -27,7 +27,7 @@ public class Chunk
     {
         coord = _coord;
         world = _world;
-        
+
         chunkObject = new GameObject();
         isActive = false;
 
@@ -68,7 +68,8 @@ public class Chunk
             {
                 for (int z = 0; z < VoxelData.ChunkWidth; z++)
                 {
-                    AddVoxelDataToChunk(new Vector3(x, y, z));
+                    if (world.blockTypes[voxelMap[x, y, z]].isSolid)
+                        AddVoxelDataToChunk(new Vector3(x, y, z));
                 }
             }
         }
@@ -77,6 +78,7 @@ public class Chunk
     // 0 is within chunk, not within worldspace
     bool IsVoxelInChunk(int x, int y, int z)
     {
+
         if (x < 0 || x > VoxelData.ChunkWidth - 1 ||
             y < 0 || y > VoxelData.ChunkHeight - 1 ||
             z < 0 || z > VoxelData.ChunkWidth - 1)
@@ -114,7 +116,9 @@ public class Chunk
         {
             // Check surrouding area. If a block is covering this face, dont draw it
             // Otherwise this face is exposed, draw it
-            if (!CheckVoxel(position + VoxelData.checkFaces[currentFace]))
+
+            Vector3 nextVoxelToCheck = position + VoxelData.checkFaces[currentFace];
+            if (!CheckVoxel(nextVoxelToCheck))
             {
                 // Populate the four corners of the face of the block.
                 vertices.Add(position + VoxelData.voxelVertices[VoxelData.voxelTriangles[currentFace, 0]]);
