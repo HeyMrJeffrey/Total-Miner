@@ -18,7 +18,7 @@ public class Chunk
     List<Vector2> uvs = new List<Vector2>();
 
     // Stores voxel data
-    byte[,,] voxelMap = new byte[VoxelData.ChunkWidth,
+    public byte[,,] voxelMap = new byte[VoxelData.ChunkWidth,
                                 VoxelData.ChunkHeight,
                                 VoxelData.ChunkWidth];
 

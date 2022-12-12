@@ -23,7 +23,7 @@ public class World : MonoBehaviour
 
         spawnPosition = new Vector3(
                             (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f,
-                            VoxelData.ChunkHeight + 2f,
+                            VoxelData.ChunkHeight - 50f,
                             (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f
                             );
         GenerateWorld();
@@ -35,10 +35,14 @@ public class World : MonoBehaviour
     private void Update()
     {
         playerChunkCoord = GetChunkCoordFromVector3(player.position);
+
+        /*
+        //Only update the chunks if the player has moved from the chunk they were previously on.
         if (!playerChunkCoord.Equals(playerLastChunkCoord))
         {
             CheckViewDistance();
         }
+        */
     }
 
     // First initialization of the world
@@ -97,6 +101,27 @@ public class World : MonoBehaviour
             chunkMap[prevCoord.x, prevCoord.z].isActive = false;
         }
     }
+    /// TODO: Need to prevent reference exception errors if player ends up outside world space.
+    /// As of right now, we assume player MUST BE in a vlid world space
+    // take in global vector 3 (800,200,1024), true if voxel is in world false otherwise
+    public bool CheckForVoxel(float _x, float _y, float _z)
+    {
+        // get bottom left back corner of each voxel
+        int xCheck = Mathf.FloorToInt(_x);
+        int yCheck= Mathf.FloorToInt(_y);
+        int zCheck = Mathf.FloorToInt(_z);
+
+        int xChunk = xCheck / VoxelData.ChunkWidth;
+        int zChunk = zCheck / VoxelData.ChunkWidth;
+
+        // get voxel value within the chunk
+        // dont need y, there is only one chunk up and down
+        xCheck -= (xChunk * VoxelData.ChunkWidth);
+        zCheck -= (zChunk * VoxelData.ChunkWidth);
+
+        return blockTypes[chunkMap[xChunk, zChunk].voxelMap[xCheck, yCheck, zCheck]].isSolid;
+    }
+
 
     // *****************************
     // Engine that drives generation
