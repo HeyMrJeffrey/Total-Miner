@@ -11,6 +11,10 @@ public class Chunk
     GameObject chunkObject;
     World world;
 
+    private bool _isActive;
+
+    public bool isVoxelMapPopulated = false;
+
     int vertexIndex = 0;
     // List is not he efficient way of doing this, but it is the easiest
     List<Vector3> vertices = new List<Vector3>();
@@ -23,11 +27,18 @@ public class Chunk
                                 VoxelData.ChunkWidth];
 
     // Constructor
-    public Chunk(ChunkCoord _coord, World _world)
+    public Chunk(ChunkCoord _coord, World _world, bool generateOnLoad)
     {
         coord = _coord;
         world = _world;
+        _isActive = true;
 
+        if (generateOnLoad)
+            Init();
+    }
+
+    public void Init()
+    {
         chunkObject = new GameObject();
         isActive = false;
 
@@ -57,6 +68,8 @@ public class Chunk
                 }
             }
         }
+
+        isVoxelMapPopulated = true;
     }
 
     void CreateMeshData()
@@ -102,10 +115,23 @@ public class Chunk
 
         if (!IsVoxelInChunk(x, y, z))
         {
-            return world.blockTypes[world.GetVoxel(pos + position)].isSolid;
+            return world.CheckForVoxel(pos + position);
         }
 
         return world.blockTypes[voxelMap[x, y, z]].isSolid;
+    }
+
+    // use by external scripts
+    public byte GetVoxelFromGlobalVector3(Vector3 pos)
+    {
+        int xCheck = Mathf.FloorToInt(pos.x);
+        int yCheck = Mathf.FloorToInt(pos.y);
+        int zCheck = Mathf.FloorToInt(pos.z);
+
+        xCheck -= Mathf.FloorToInt(chunkObject.transform.position.x);
+        zCheck -= Mathf.FloorToInt(chunkObject.transform.position.z);
+
+        return voxelMap[xCheck, yCheck, zCheck];
     }
 
     // position - coordinate of the voxel
@@ -160,29 +186,35 @@ public class Chunk
         // Update the mesh filter
         meshFilter.mesh = mesh;
     }
-
+    /*
+     * #if DEBUG
+            if (chunkObject == null)
+                Debug.LogError($"Chunk ({coord.x}, {coord.z})'s {nameof(isActive)} property was accessed (read) while the chunkObject was null");
+#endif
+    #if DEBUG
+            if (chunkObject == null)
+                Debug.LogError($"Chunk ({coord.x}, {coord.z})'s {nameof(isActive)} property was accessed (write) while the chunkObject was null");
+#endif
+     */
     public bool isActive
     {
         get
         {
-#if DEBUG
-            if (chunkObject == null)
-                Debug.LogError($"Chunk ({coord.x}, {coord.z})'s {nameof(isActive)} property was accessed (read) while the chunkObject was null");
-#endif
-            return chunkObject.activeSelf;
+            return _isActive;
         }
         set
         {
-#if DEBUG
-            if (chunkObject == null)
-                Debug.LogError($"Chunk ({coord.x}, {coord.z})'s {nameof(isActive)} property was accessed (write) while the chunkObject was null");
-#endif
+            _isActive = value;
+            if (chunkObject != null)
+            {
+                chunkObject.SetActive(value);
+            }
             //TODO: This will most likely need a threadlock (lock) on the adding/removing for enumerator iteration in other threads.
-            if (!value && world.activeChunks.Contains(this.coord))
-                world.activeChunks.Remove(this.coord);
-            else if (value && !world.activeChunks.Contains(this.coord))
-                world.activeChunks.Add(this.coord);
-            chunkObject.SetActive(value);
+            //if (!value && world.activeChunks.Contains(this.coord))
+            //    world.activeChunks.Remove(this.coord);
+            //else if (value && !world.activeChunks.Contains(this.coord))
+            //    world.activeChunks.Add(this.coord);
+            //chunkObject.SetActive(value);
         }
     }
 
@@ -221,10 +253,25 @@ public class ChunkCoord
     public int x;
     public int z;
 
+    public ChunkCoord()
+    {
+        x = 0;
+        z = 0;
+    }
+
     public ChunkCoord(int _x, int _z)
     {
         x = _x;
         z = _z;
+    }
+
+    public ChunkCoord(Vector3 pos)
+    {
+        int xCheck = Mathf.FloorToInt(pos.x);
+        int zCheck = Mathf.FloorToInt(pos.z);
+
+        x = xCheck / VoxelData.ChunkWidth;
+        z = zCheck / VoxelData.ChunkWidth;
     }
 
     public bool Equals(ChunkCoord coordToCompare)
