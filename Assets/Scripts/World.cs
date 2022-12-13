@@ -33,7 +33,7 @@ public class World : MonoBehaviour
                             );
         GenerateWorld();
 
-        playerLastChunkCoord = GetChunkCoordFromVector3(player.position);
+        playerLastChunkCoord = playerChunkCoord = GetChunkCoordFromVector3(player.position);
         CheckViewDistance(); //temporary, just spawn immediate chunks instead, this is very hacky way of getting the initial chunks to load when the game starts
     }
 
