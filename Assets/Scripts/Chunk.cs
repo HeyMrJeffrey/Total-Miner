@@ -127,10 +127,10 @@ public class Chunk
         voxelMap[xCheck, yCheck, zCheck] = newID;
 
         
-        UpdateChunk();
-
         // Update Surrounding Chunks
         UpdateSurroundingVoxels(xCheck, yCheck, zCheck);
+
+        UpdateChunk();
 
     }
 
