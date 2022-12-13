@@ -19,6 +19,8 @@ public class Chunk
     // List is not he efficient way of doing this, but it is the easiest
     List<Vector3> vertices = new List<Vector3>();
     List<int> triangles = new List<int>();
+    List<int> transparentTriangles = new List<int>();
+    Material[] materials = new Material[2];
     List<Vector2> uvs = new List<Vector2>();
 
     // Stores voxel data
@@ -44,7 +46,12 @@ public class Chunk
 
         meshFilter = chunkObject.AddComponent<MeshFilter>();
         meshRenderer = chunkObject.AddComponent<MeshRenderer>();
-        meshRenderer.material = world.material;
+
+        materials[0] = world.material;
+        materials[1] = world.transparentMaterial;
+
+        meshRenderer.materials = materials;
+
         chunkObject.transform.SetParent(world.transform);
         chunkObject.transform.position = new Vector3(coord.x * VoxelData.ChunkWidth,
                                                      0f,
@@ -150,10 +157,10 @@ public class Chunk
 
         if (!IsVoxelInChunk(x, y, z))
         {
-            return world.CheckForVoxel(pos + position);
+            return world.CheckIfVoxelTransparent(pos + position);
         }
 
-        return world.blockTypes[voxelMap[x, y, z]].isSolid;
+        return world.blockTypes[voxelMap[x, y, z]].isTransparent;
     }
 
     // use by external scripts
@@ -166,12 +173,32 @@ public class Chunk
         xCheck -= Mathf.FloorToInt(chunkObject.transform.position.x);
         zCheck -= Mathf.FloorToInt(chunkObject.transform.position.z);
 
-        return voxelMap[xCheck, yCheck, zCheck];
+        if (xCheck < 0)
+        {
+            xCheck = 0;
+        }
+        if (zCheck < 0)
+        {
+            zCheck = 0;
+        }
+
+        try
+        {
+            return voxelMap[xCheck, yCheck, zCheck];
+        }
+        catch
+        {
+            Debug.Log(xCheck + "," + yCheck + "," + zCheck);
+            return voxelMap[0, 0, 0];
+        }
     }
 
     // position - coordinate of the voxel
     void UpdateMeshData(Vector3 position)
     {
+        byte blockID = voxelMap[(int)position.x, (int)position.y, (int)position.z];
+        bool isTransparent = world.blockTypes[blockID].isTransparent;
+
         // Loop through each face (6 faces per block)
         for (int currentFace = 0; currentFace < 6; currentFace++)
         {
@@ -179,7 +206,7 @@ public class Chunk
             // Otherwise this face is exposed, draw it
 
             Vector3 nextVoxelToCheck = position + VoxelData.checkFaces[currentFace];
-            if (!CheckVoxel(nextVoxelToCheck))
+            if (CheckVoxel(nextVoxelToCheck))
             {
                 // Populate the four corners of the face of the block.
                 vertices.Add(position + VoxelData.voxelVertices[VoxelData.voxelTriangles[currentFace, 0]]);
@@ -187,18 +214,29 @@ public class Chunk
                 vertices.Add(position + VoxelData.voxelVertices[VoxelData.voxelTriangles[currentFace, 2]]);
                 vertices.Add(position + VoxelData.voxelVertices[VoxelData.voxelTriangles[currentFace, 3]]);
 
-                byte blockID = voxelMap[(int)position.x, (int)position.y, (int)position.z];
-
                 AddTexture(world.blockTypes[blockID].GetTextureID(currentFace));
 
-                // Populate the six vertices to draw the 2 triangles
-                // Two vertices must overlap to get a crisp edge
-                triangles.Add(vertexIndex + 0);
-                triangles.Add(vertexIndex + 1);
-                triangles.Add(vertexIndex + 2);
-                triangles.Add(vertexIndex + 2);
-                triangles.Add(vertexIndex + 1);
-                triangles.Add(vertexIndex + 3);
+
+                if (!isTransparent)
+                {
+                    // Populate the six vertices to draw the 2 triangles
+                    // Two vertices must overlap to get a crisp edge
+                    triangles.Add(vertexIndex + 0);
+                    triangles.Add(vertexIndex + 1);
+                    triangles.Add(vertexIndex + 2);
+                    triangles.Add(vertexIndex + 2);
+                    triangles.Add(vertexIndex + 1);
+                    triangles.Add(vertexIndex + 3);
+                }
+                else
+                {
+                    transparentTriangles.Add(vertexIndex + 0);
+                    transparentTriangles.Add(vertexIndex + 1);
+                    transparentTriangles.Add(vertexIndex + 2);
+                    transparentTriangles.Add(vertexIndex + 2);
+                    transparentTriangles.Add(vertexIndex + 1);
+                    transparentTriangles.Add(vertexIndex + 3);
+                }
 
                 // Increment the vertex index
                 vertexIndex += 4;
@@ -211,7 +249,9 @@ public class Chunk
         // Build Mesh
         Mesh mesh = new Mesh();
         mesh.vertices = vertices.ToArray();
-        mesh.triangles = triangles.ToArray();
+        mesh.subMeshCount = 2;
+        mesh.SetTriangles(triangles.ToArray(), 0);
+        mesh.SetTriangles(transparentTriangles.ToArray(), 1);
         mesh.uv = uvs.ToArray();
 
         // Recalc Normals because each vertice has a direction (3 directions per vertice)
@@ -227,6 +267,7 @@ public class Chunk
         vertexIndex = 0;
         vertices.Clear();
         triangles.Clear();
+        transparentTriangles.Clear();
         uvs.Clear();
     }
 

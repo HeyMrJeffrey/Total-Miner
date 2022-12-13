@@ -142,7 +142,7 @@ public class Player : MonoBehaviour
             if (Input.GetMouseButtonDown(1))
             {
                 //Place Block
-                world.GetChunkFromVector3(highlightBlock.position).EditVoxel(placeBlock.position, selectedBlockIndex);
+                world.GetChunkFromVector3(placeBlock.position).EditVoxel(placeBlock.position, selectedBlockIndex);
             }
         }
     }

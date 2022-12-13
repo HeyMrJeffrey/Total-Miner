@@ -10,6 +10,7 @@ public class World : MonoBehaviour
     public Transform player;
     public Vector3 spawnPosition;
     public Material material;
+    public Material transparentMaterial;
     public BlockType[] blockTypes;
     Chunk[,] chunkMap = new Chunk[VoxelData.WorldSizeInChunks, VoxelData.WorldSizeInChunks];
 
@@ -27,7 +28,7 @@ public class World : MonoBehaviour
 
         spawnPosition = new Vector3(
                             (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f,
-                            VoxelData.ChunkHeight - 50f,
+                            VoxelData.ChunkHeight - 60f,
                             (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f
                             );
         GenerateWorld();
@@ -166,6 +167,21 @@ public class World : MonoBehaviour
         return blockTypes[GetVoxel(pos)].isSolid;
     }
 
+    public bool CheckIfVoxelTransparent(Vector3 pos)
+    {
+        ChunkCoord thisChunk = new ChunkCoord(pos);
+
+        if (!IsChunkInWorld(thisChunk) || pos.y < 0 || pos.y > VoxelData.ChunkHeight)
+            return false;
+
+        if (chunkMap[thisChunk.x, thisChunk.z] != null && chunkMap[thisChunk.x, thisChunk.z].isVoxelMapPopulated)
+        {
+            return blockTypes[chunkMap[thisChunk.x, thisChunk.z].GetVoxelFromGlobalVector3(pos)].isTransparent;
+        }
+
+        return blockTypes[GetVoxel(pos)].isTransparent;
+    }
+
 
     // *****************************
     // Engine that drives generation
@@ -178,10 +194,13 @@ public class World : MonoBehaviour
         1 = Bedrock
         2 = Stone
         3 = Grass
-        4 = Dirt
-        5 = Furnace
-        6 = Sand
-        7 = Dirt
+        4 = Sand
+        5 = Dirt
+        6 = Wood
+        7 = WoodPlanks
+        8 = Bricks
+        9 = Cobblestone
+        10 = Glass
         */
 
         int yPos = Mathf.FloorToInt(pos.y);
@@ -207,7 +226,7 @@ public class World : MonoBehaviour
         if (yPos == terrainHeight)
             voxelValue = 3; //Grass
         else if (yPos < terrainHeight && yPos > terrainHeight - 4)
-            voxelValue = 7; //Dirt
+            voxelValue = 5; //Dirt
         else if (yPos > terrainHeight)
             return 0; //Air
         else
@@ -259,7 +278,8 @@ public class World : MonoBehaviour
 public class BlockType
 {
     public string blockName;
-    public bool isSolid;
+    public bool isSolid;         //Whether the block is physically there (can player pass through the block like air? or not)
+    public bool isTransparent;    //Whether the block can be seen through by the player
     public Sprite icon;
 
     [Header("Texture Values")]

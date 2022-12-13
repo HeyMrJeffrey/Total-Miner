@@ -107,7 +107,91 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: stone_icon
+      name: stone_texture
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 96
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 94ec884b15882894fab971478e11777a
+      internalID: 1132172055
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: grass_texture
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 96
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4b6b66afb0b339d448fec4e3dfe6ce84
+      internalID: -1131351482
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dirt_texture
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 96
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5464159d162d7f8458fc416376a51cbd
+      internalID: -642522426
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glass_texture
+      rect:
+        serializedVersion: 2
+        x: 95
+        y: 96
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d3d57dcc90ce9794a8c1823d67666933
+      internalID: -426669468
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: wood_texture
       rect:
         serializedVersion: 2
         x: 0
@@ -121,14 +205,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7e0085c085af5c946800594f8fd4512a
-      internalID: 1344802677
+      spriteID: 6247ca39a8374c5479755e83aad8e5a7
+      internalID: -1143001203
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: grass_icon
+      name: bricks_texture
       rect:
         serializedVersion: 2
         x: 32
@@ -142,14 +226,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b3efbab0254ca4f4f9e150cb1298ca58
-      internalID: 1839248511
+      spriteID: 3506aad343b492f42899f191fd0882d2
+      internalID: -1424521666
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: dirt_icon
+      name: bedrock_texture
       rect:
         serializedVersion: 2
         x: 64
@@ -163,14 +247,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 965b86a2fcbbefd449e4a2cd7a2c0643
-      internalID: 131537833
+      spriteID: 083fd70951caabd40843397c8bb76f5e
+      internalID: -1033368731
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wood_icon
+      name: sand_texture
       rect:
         serializedVersion: 2
         x: 0
@@ -184,14 +268,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9d1dd97af10691842a35102bd451cf9b
-      internalID: 1329280253
+      spriteID: fd2e935d3e33c6d48ba79f7db7fddff8
+      internalID: -613934765
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: bricks_icon
+      name: woodplanks_texture
       rect:
         serializedVersion: 2
         x: 32
@@ -205,14 +289,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 31bf3a821ae68c84d9f420ea636c27b9
-      internalID: -1835139119
+      spriteID: 1286a4169f9169646a700642b99b5026
+      internalID: -2092424863
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: bedrock_icon
+      name: cobblestone_texture
       rect:
         serializedVersion: 2
         x: 64
@@ -226,71 +310,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 14793ac9916f6be43bec8d5335c70cda
-      internalID: 1014596568
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: sand_icon
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a1b06bc8c0b192444a63fd509e2be7f2
-      internalID: 967861267
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: woodplanks_icon
-      rect:
-        serializedVersion: 2
-        x: 32
-        y: 0
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 49161bb5cf0ad634f8655ed7ce42fc5c
-      internalID: 433533127
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: cobblestone_icon
-      rect:
-        serializedVersion: 2
-        x: 64
-        y: 0
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: dc9b5f8adb0fed24a89af4517f1c825a
-      internalID: 389366145
+      spriteID: bddc1485129628f4da34343494d6cdc7
+      internalID: 1239439430
       vertices: []
       indices: 
       edges: []
@@ -298,7 +319,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 041d78702b0cd5b40acba7dcc2d16487
+    spriteID: a69ba97eda0387e49b9826532c91b611
     internalID: 0
     vertices: []
     indices: 
@@ -306,15 +327,16 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      cobblestone_icon: 389366145
-      wood_icon: 1329280253
-      bricks_icon: -1835139119
-      bedrock_icon: 1014596568
-      sand_icon: 967861267
-      grass_icon: 1839248511
-      stone_icon: 1344802677
-      woodplanks_icon: 433533127
-      dirt_icon: 131537833
+      grass_texture: -1131351482
+      cobblestone_texture: 1239439430
+      wood_texture: -1143001203
+      glass_texture: -426669468
+      stone_texture: 1132172055
+      dirt_texture: -642522426
+      sand_texture: -613934765
+      woodplanks_texture: -2092424863
+      bricks_texture: -1424521666
+      bedrock_texture: -1033368731
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
