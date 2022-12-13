@@ -105,7 +105,8 @@ public class World : MonoBehaviour
     {
         int x = Mathf.FloorToInt(pos.x / VoxelData.ChunkWidth);
         int z = Mathf.FloorToInt(pos.z / VoxelData.ChunkWidth);
-
+        if (!IsVoxelInWorld(pos)) //If the position given is out of the world bounds, then there is no chunk there.
+            return null;
         return chunkMap[x, z];
     }
 

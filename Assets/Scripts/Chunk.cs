@@ -114,7 +114,7 @@ public class Chunk
         }
     }
 
-    public void EditVoxel (Vector3 pos, byte newID)
+    public void EditVoxel(Vector3 pos, byte newID)
     {
 
         int xCheck = Mathf.FloorToInt(pos.x);
@@ -126,6 +126,7 @@ public class Chunk
 
         voxelMap[xCheck, yCheck, zCheck] = newID;
 
+        
         UpdateChunk();
 
         // Update Surrounding Chunks
@@ -143,7 +144,17 @@ public class Chunk
 
             if (!IsVoxelInChunk((int)currentVoxel.x, (int)currentVoxel.y, (int)currentVoxel.z))
             {
-                world.GetChunkFromVector3(thisVoxel + position).UpdateChunk();
+                /*
+                 * We have the block position that we are editing (thisVoxel), so to get the neighbouring chunk in the direction of the currentFace iteration, we
+                 * simply add together the position of the block we are editing to our chunk's position and then add the face direction.  This will give us the
+                 * neighbouring block position (next to thisVoxel) that resides in the neighbouring chunk.  We then get the neighbouring chunk and if the 
+                 * chunk is valid (not out of world bounds), then we update it.
+                */
+                var targetChunk = world.GetChunkFromVector3(thisVoxel + position + VoxelData.checkFaces[currentFace]);
+
+                //Chunk could be null if the position given is out of the world bounds.
+                if (targetChunk != null) 
+                    targetChunk.UpdateChunk();
             }
         }
     }
@@ -173,16 +184,16 @@ public class Chunk
         int zCheck = Mathf.FloorToInt(pos.z);
 
         if (!world.IsVoxelInWorld(new Vector3(xCheck, yCheck, zCheck)))
-             return 0; //Return air
+            return 0; //Return air
 
         xCheck -= Mathf.FloorToInt(chunkObject.transform.position.x);
         zCheck -= Mathf.FloorToInt(chunkObject.transform.position.z);
 
-        
+
 
         if (xCheck < 0)
         {
-             Debug.LogWarning($"{nameof(GetVoxelFromGlobalVector3)} -> xCheck was negative: {xCheck}, pos: ({pos.ToString()})");
+            Debug.LogWarning($"{nameof(GetVoxelFromGlobalVector3)} -> xCheck was negative: {xCheck}, pos: ({pos.ToString()})");
 
             xCheck = 0;
         }
