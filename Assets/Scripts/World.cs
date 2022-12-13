@@ -28,7 +28,7 @@ public class World : MonoBehaviour
 
         spawnPosition = new Vector3(
                             (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f,
-                            VoxelData.ChunkHeight - 60f,
+                            VoxelData.ChunkHeight,
                             (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f
                             );
         GenerateWorld();

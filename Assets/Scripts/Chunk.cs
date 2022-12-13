@@ -116,6 +116,7 @@ public class Chunk
 
     public void EditVoxel (Vector3 pos, byte newID)
     {
+
         int xCheck = Mathf.FloorToInt(pos.x);
         int yCheck = Mathf.FloorToInt(pos.y);
         int zCheck = Mathf.FloorToInt(pos.z);
@@ -125,10 +126,11 @@ public class Chunk
 
         voxelMap[xCheck, yCheck, zCheck] = newID;
 
+        UpdateChunk();
+
         // Update Surrounding Chunks
         UpdateSurroundingVoxels(xCheck, yCheck, zCheck);
 
-        UpdateChunk();
     }
 
     void UpdateSurroundingVoxels(int x, int y, int z)
@@ -170,15 +172,24 @@ public class Chunk
         int yCheck = Mathf.FloorToInt(pos.y);
         int zCheck = Mathf.FloorToInt(pos.z);
 
+        if (!world.IsVoxelInWorld(new Vector3(xCheck, yCheck, zCheck)))
+             return 0; //Return air
+
         xCheck -= Mathf.FloorToInt(chunkObject.transform.position.x);
         zCheck -= Mathf.FloorToInt(chunkObject.transform.position.z);
 
+        
+
         if (xCheck < 0)
         {
+             Debug.LogWarning($"{nameof(GetVoxelFromGlobalVector3)} -> xCheck was negative: {xCheck}, pos: ({pos.ToString()})");
+
             xCheck = 0;
         }
         if (zCheck < 0)
         {
+            Debug.LogWarning($"{nameof(GetVoxelFromGlobalVector3)} -> zCheck was negative: {zCheck}, pos: ({pos.ToString()})");
+
             zCheck = 0;
         }
 
