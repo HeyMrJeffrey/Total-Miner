@@ -51,8 +51,7 @@ public class Chunk
                                                      coord.z * VoxelData.ChunkWidth);
         chunkObject.name = "Chunk: " + coord.x + "," + coord.z;
         PopulateVoxelMap();
-        CreateMeshData();
-        CreateMesh();
+        UpdateChunk();
     }
 
     //Populates the voxels within a chunk
@@ -72,8 +71,10 @@ public class Chunk
         isVoxelMapPopulated = true;
     }
 
-    void CreateMeshData()
+    void UpdateChunk()
     {
+        ClearMeshData();
+
         // Layer from bottom up.
         for (int y = 0; y < VoxelData.ChunkHeight; y++)
         {
@@ -82,10 +83,12 @@ public class Chunk
                 for (int z = 0; z < VoxelData.ChunkWidth; z++)
                 {
                     if (world.blockTypes[voxelMap[x, y, z]].isSolid)
-                        AddVoxelDataToChunk(new Vector3(x, y, z));
+                        UpdateMeshData(new Vector3(x, y, z));
                 }
             }
         }
+
+        CreateMesh();
     }
 
     // 0 is within chunk, not within worldspace
@@ -101,6 +104,38 @@ public class Chunk
         else
         {
             return true;
+        }
+    }
+
+    public void EditVoxel (Vector3 pos, byte newID)
+    {
+        int xCheck = Mathf.FloorToInt(pos.x);
+        int yCheck = Mathf.FloorToInt(pos.y);
+        int zCheck = Mathf.FloorToInt(pos.z);
+
+        xCheck -= Mathf.FloorToInt(chunkObject.transform.position.x);
+        zCheck -= Mathf.FloorToInt(chunkObject.transform.position.z);
+
+        voxelMap[xCheck, yCheck, zCheck] = newID;
+
+        // Update Surrounding Chunks
+        UpdateSurroundingVoxels(xCheck, yCheck, zCheck);
+
+        UpdateChunk();
+    }
+
+    void UpdateSurroundingVoxels(int x, int y, int z)
+    {
+        Vector3 thisVoxel = new Vector3(x, y, z);
+
+        for (int currentFace = 0; currentFace < 6; currentFace++)
+        {
+            Vector3 currentVoxel = thisVoxel + VoxelData.checkFaces[currentFace];
+
+            if (!IsVoxelInChunk((int)currentVoxel.x, (int)currentVoxel.y, (int)currentVoxel.z))
+            {
+                world.GetChunkFromVector3(thisVoxel + position).UpdateChunk();
+            }
         }
     }
 
@@ -135,7 +170,7 @@ public class Chunk
     }
 
     // position - coordinate of the voxel
-    void AddVoxelDataToChunk(Vector3 position)
+    void UpdateMeshData(Vector3 position)
     {
         // Loop through each face (6 faces per block)
         for (int currentFace = 0; currentFace < 6; currentFace++)
@@ -186,15 +221,24 @@ public class Chunk
         // Update the mesh filter
         meshFilter.mesh = mesh;
     }
+
+    void ClearMeshData()
+    {
+        vertexIndex = 0;
+        vertices.Clear();
+        triangles.Clear();
+        uvs.Clear();
+    }
+
     /*
-     * #if DEBUG
-            if (chunkObject == null)
-                Debug.LogError($"Chunk ({coord.x}, {coord.z})'s {nameof(isActive)} property was accessed (read) while the chunkObject was null");
-#endif
+    * #if DEBUG
+    if (chunkObject == null)
+    Debug.LogError($"Chunk ({coord.x}, {coord.z})'s {nameof(isActive)} property was accessed (read) while the chunkObject was null");
+    #endif
     #if DEBUG
-            if (chunkObject == null)
-                Debug.LogError($"Chunk ({coord.x}, {coord.z})'s {nameof(isActive)} property was accessed (write) while the chunkObject was null");
-#endif
+    if (chunkObject == null)
+    Debug.LogError($"Chunk ({coord.x}, {coord.z})'s {nameof(isActive)} property was accessed (write) while the chunkObject was null");
+    #endif
      */
     public bool isActive
     {

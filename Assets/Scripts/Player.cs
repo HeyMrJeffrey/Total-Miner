@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
@@ -27,10 +28,22 @@ public class Player : MonoBehaviour
     private bool jumpRequest;
     private Vector3 velocity;
 
+    public Transform highlightBlock;
+    public Transform placeBlock;
+    public float checkIncrement = 0.1f;
+    public float reach = 8f;
+
+    public Text selectedBlockText;
+    // blocks you want to place
+    public byte selectedBlockIndex = 1;
+
     private void Start()
     {
         camera = GameObject.Find("Main Camera").transform;
         world = GameObject.Find("World").GetComponent<World>();
+
+        Cursor.lockState = CursorLockMode.Locked;
+        selectedBlockText.text = world.blockTypes[selectedBlockIndex].blockName;
     }
 
     private void FixedUpdate()
@@ -55,6 +68,7 @@ public class Player : MonoBehaviour
     private void Update()
     {
         GetPlayerInput();
+        PlaceCursorBlocks();
     }
 
     private void Jump ()
@@ -117,6 +131,78 @@ public class Player : MonoBehaviour
         {
             jumpRequest = true;
         }
+
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        if (scroll != 0)
+        {
+            if (scroll > 0)
+            {
+                selectedBlockIndex++;
+            }
+            else
+            {
+                selectedBlockIndex--;
+            }
+
+            if (selectedBlockIndex > (byte)(world.blockTypes.Length - 1))
+            {
+                selectedBlockIndex = 1;
+            }
+
+            if (selectedBlockIndex < 1)
+            {
+                selectedBlockIndex = (byte)(world.blockTypes.Length - 1);
+            }
+
+            selectedBlockText.text = world.blockTypes[selectedBlockIndex].blockName;
+        }
+
+        if (highlightBlock.gameObject.activeSelf)
+        {
+            // Left mouse click
+            if(Input.GetMouseButtonDown(0))
+            {
+                //Destroy Block
+                world.GetChunkFromVector3(highlightBlock.position).EditVoxel(highlightBlock.position, 0);
+            }
+            // Right mouse click
+            if (Input.GetMouseButtonDown(1))
+            {
+                //Place Block
+                world.GetChunkFromVector3(highlightBlock.position).EditVoxel(placeBlock.position, selectedBlockIndex);
+            }
+        }
+    }
+
+    // Faking a raycast. Is this the best idea?
+    private void PlaceCursorBlocks()
+    {
+        float step = checkIncrement;
+        Vector3 lastPos = new Vector3();
+
+        while (step < reach)
+        {
+            Vector3 pos = camera.position + (camera.forward * step);
+
+            if (world.CheckForVoxel(pos))
+            {
+                highlightBlock.position = new Vector3(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(pos.z));
+                placeBlock.position = lastPos;
+
+                highlightBlock.gameObject.SetActive(true);
+                placeBlock.gameObject.SetActive(true);
+
+                return;
+            }
+
+            lastPos = new Vector3(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(pos.z));
+
+            step += checkIncrement;
+        }
+
+        highlightBlock.gameObject.SetActive(false);
+        placeBlock.gameObject.SetActive(false);
+
     }
 
     // Determines if there is a solid block below the player. If yes, then player doesnt fall. If no, player falls to next solid block.
