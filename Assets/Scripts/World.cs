@@ -217,8 +217,6 @@ public class World : MonoBehaviour
         return chunkMap[x, z];
     }
 
-  
-
     void CheckViewDistance()
     {
         ChunkCoord coord = GetChunkCoordFromVector3(player.position);

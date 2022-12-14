@@ -43,13 +43,11 @@ public class DebugScreen : MonoBehaviour
         Vector3 belowVector = new Vector3(world.player.transform.position.x, world.player.transform.position.y - 0.1f, world.player.transform.position.z);
         tBuilt.AppendLine($"BELOW: {GetVoxelFromVector3(belowVector)}");
 
-
+        //Let's show the user in the debug screen which block they are looking at and details about it (ID, position, distance)
         HitTest rc = CalculateHitTest(playerScript.camera.position, playerScript.camera.forward, playerScript.reach);
 
         if (rc.IsValid)
-        {
             tBuilt.AppendLine($"RC: POS ({rc.Point.ToString()}), ID: {GetVoxelFromVector3(rc.Point)}, DIST: {rc.Distance}");
-        }
         else
             tBuilt.AppendLine("NO RC");
 
@@ -73,7 +71,7 @@ public class DebugScreen : MonoBehaviour
     {
         public bool IsValid;
         public Vector3Int Point;
-        public int FacePos;
+        public int FacePos; //This may or may not be used one day, if it can be done.
         public float Distance;
     }
     public HitTest CalculateHitTest(Vector3 origin, Vector3 dir, float range)
@@ -270,6 +268,7 @@ public class DebugScreen : MonoBehaviour
     /// </summary>
     public Bounds GetBlockBox(Vector3 pos)
     {
+        //This function will be expanded to accomodate other shaped blocks such as a half block or a stackblock (snowlayer, layer of leafs on the ground..etc)
         var blockIDAtPos = GetVoxelFromVector3(pos);
         var posInt = new Vector3Int(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(pos.z));
         switch (blockIDAtPos)
@@ -286,7 +285,7 @@ public class DebugScreen : MonoBehaviour
                         },
                         max = new Vector3()
                         {
-                            x = posInt.x + 1,
+                            x = posInt.x + 1, //TODO: We should define a global 'TileSize' value which should define the size of a standard block. (TileSize^3 would be one single block)
                             y = posInt.y + 1,
                             z = posInt.z + 1
                         }
@@ -296,10 +295,14 @@ public class DebugScreen : MonoBehaviour
                 }
         }
     }
+    
     public Vector3 GetBlockCenter(Vector3 point)
     {
+        //This is to be expanded upon in the future.
+        //However, as for now, it simply returns the center point of a given voxel/block position in world space.
         return new Vector3(point.x + 0.5f, point.y + 0.5f, point.z + 0.5f);
     }
+
     /// <summary>
     /// Get a block ID at a given position on the map.
     /// </summary>
