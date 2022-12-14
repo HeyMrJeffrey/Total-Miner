@@ -28,6 +28,8 @@ public class Chunk
                                 VoxelData.ChunkHeight,
                                 VoxelData.ChunkWidth];
 
+    public Queue<VoxelMod> modifications = new Queue<VoxelMod>();
+
     // Constructor
     public Chunk(ChunkCoord _coord, World _world, bool generateOnLoad)
     {
@@ -78,8 +80,15 @@ public class Chunk
         isVoxelMapPopulated = true;
     }
 
-    void UpdateChunk()
+    public void UpdateChunk()
     {
+        while(modifications.Count > 0)
+        {
+            VoxelMod v = modifications.Dequeue();
+            Vector3 pos = v.position -= position;
+            voxelMap[(int)pos.x, (int)pos.y, (int)pos.z] = v.id;
+        }
+
         ClearMeshData();
 
         // Layer from bottom up.
@@ -189,30 +198,7 @@ public class Chunk
         xCheck -= Mathf.FloorToInt(chunkObject.transform.position.x);
         zCheck -= Mathf.FloorToInt(chunkObject.transform.position.z);
 
-
-
-        if (xCheck < 0)
-        {
-            Debug.LogWarning($"{nameof(GetVoxelFromGlobalVector3)} -> xCheck was negative: {xCheck}, pos: ({pos.ToString()})");
-
-            xCheck = 0;
-        }
-        if (zCheck < 0)
-        {
-            Debug.LogWarning($"{nameof(GetVoxelFromGlobalVector3)} -> zCheck was negative: {zCheck}, pos: ({pos.ToString()})");
-
-            zCheck = 0;
-        }
-
-        try
-        {
-            return voxelMap[xCheck, yCheck, zCheck];
-        }
-        catch
-        {
-            Debug.Log(xCheck + "," + yCheck + "," + zCheck);
-            return voxelMap[0, 0, 0];
-        }
+        return voxelMap[xCheck, yCheck, zCheck];
     }
 
     // position - coordinate of the voxel
