@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
     public bool isGrounded;
     public bool isSprinting;
 
-    private Transform camera;
+    public Transform camera;
     private World world;
 
     public float walkSpeed = 3f;
@@ -152,7 +152,7 @@ public class Player : MonoBehaviour
     {
         float step = checkIncrement;
         Vector3 lastPos = new Vector3();
-
+        
         while (step < reach)
         {
             Vector3 pos = camera.position + (camera.forward * step);
@@ -167,7 +167,6 @@ public class Player : MonoBehaviour
 
                 return;
             }
-
             lastPos = new Vector3(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(pos.z));
 
             step += checkIncrement;
@@ -177,6 +176,8 @@ public class Player : MonoBehaviour
         placeBlock.gameObject.SetActive(false);
 
     }
+
+
 
     // Determines if there is a solid block below the player. If yes, then player doesnt fall. If no, player falls to next solid block.
     // Also modifies isGrounded to allow or deny the player their jump ability

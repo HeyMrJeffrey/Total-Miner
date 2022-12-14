@@ -57,12 +57,12 @@ public class World : MonoBehaviour
             StartCoroutine(ApplyModifications());
         }
 
-        if(chunksToCreate.Count > 0)
+        if (chunksToCreate.Count > 0)
         {
             CreateChunk();
         }
 
-        if(chunksToUpdate.Count > 0)
+        if (chunksToUpdate.Count > 0)
         {
             UpdateChunks();
         }
@@ -71,7 +71,7 @@ public class World : MonoBehaviour
         {
             debugScreen.SetActive(!debugScreen.activeSelf);
         }
-        
+
     }
 
     // First initialization of the world
@@ -89,7 +89,7 @@ public class World : MonoBehaviour
 
         /// TODO: Everytime we are useing a queue, we need to ensure we are not adding to it elsewhere
         /// Otherwise we may end up in an endless loop (perhaps lock the queue?)
-        while(modifications.Count > 0)
+        while (modifications.Count > 0)
         {
             VoxelMod v = modifications.Dequeue();
             ChunkCoord coord = GetChunkCoordFromVector3(v.position);
@@ -133,12 +133,12 @@ public class World : MonoBehaviour
         chunkMap[coord.x, coord.z].Init();
     }
 
-    void UpdateChunks ()
+    void UpdateChunks()
     {
         bool updated = false;
         int index = 0;
 
-        while (!updated && index < chunksToUpdate.Count-1)
+        while (!updated && index < chunksToUpdate.Count - 1)
         {
             if (chunksToUpdate[index].isVoxelMapPopulated)
             {
@@ -158,7 +158,7 @@ public class World : MonoBehaviour
         applyingModifications = true;
         int count = 0;
 
-        while(modifications.Count > 0)
+        while (modifications.Count > 0)
         {
             VoxelMod v = modifications.Dequeue();
             ChunkCoord coord = GetChunkCoordFromVector3(v.position);
@@ -185,7 +185,7 @@ public class World : MonoBehaviour
 
                 count++;
                 // Only 200 voxel modifications per frame
-                if(count > 200)
+                if (count > 200)
                 {
                     count = 0;
                     yield return null;
@@ -211,11 +211,13 @@ public class World : MonoBehaviour
         int z = Mathf.FloorToInt(pos.z / VoxelData.ChunkWidth);
 
         //If the position given is out of the world bounds, then there is no chunk there.
-        if (!IsVoxelInWorld(pos)) 
+        if (!IsVoxelInWorld(pos))
             return null;
 
         return chunkMap[x, z];
     }
+
+  
 
     void CheckViewDistance()
     {
@@ -235,7 +237,7 @@ public class World : MonoBehaviour
                         chunkMap[x, z] = new Chunk(new ChunkCoord(x, z), this, false);
                         chunksToCreate.Add(new ChunkCoord(x, z));
                     }
-                    else if (!(chunkMap[x,z].isActive))
+                    else if (!(chunkMap[x, z].isActive))
                     {
                         chunkMap[x, z].isActive = true;
                     }
@@ -309,6 +311,7 @@ public class World : MonoBehaviour
         8 = Bricks
         9 = Cobblestone
         10 = Glass
+        11 = Leaves
         */
 
         int yPos = Mathf.FloorToInt(pos.y);
@@ -318,11 +321,11 @@ public class World : MonoBehaviour
 
         //If outside the world, return an air block.
         if (!IsVoxelInWorld(pos))
-            return 0;
+            return 0; //Air
 
         //If bottom block of chunk, return bedrock
         if (yPos == 0)
-            return 1;
+            return 1; //Bedrock
 
 
         /* BASIC TERRAIN PASS */
@@ -357,17 +360,17 @@ public class World : MonoBehaviour
             }
         }
 
-        /* TREE PASS */ 
+        /* TREE PASS */
 
         if (yPos == terrainHeight)
         {
-            if(Noise.Get2DPerlin(new Vector2(pos.x, pos.z), 0, biome.treeZoneScale) > biome.treeZoneThreshold)
+            if (Noise.Get2DPerlin(new Vector2(pos.x, pos.z), 0, biome.treeZoneScale) > biome.treeZoneThreshold)
             {
-                voxelValue = 5; // Made this dirt just to show where trees *can* spawn. Just remove to go back to grass
+                voxelValue = 5; // Dirt. Made this dirt just to show where trees *can* spawn. Just remove to go back to grass
 
-                if(Noise.Get2DPerlin(new Vector2(pos.x, pos.z), 0, biome.treePlacementScale) > biome.treePlacementThreshold)
+                if (Noise.Get2DPerlin(new Vector2(pos.x, pos.z), 0, biome.treePlacementScale) > biome.treePlacementThreshold)
                 {
-                    Structure.MakeTree(pos, modifications, biome.maxTreeHeight, biome.minTreeHeight);
+                    Structure.MakeTree(pos, modifications, biome.minTreeHeight, biome.maxTreeHeight);
                 }
             }
         }
@@ -388,13 +391,15 @@ public class World : MonoBehaviour
         if (coord.x >= 0 && coord.x < VoxelData.WorldSizeInChunks &&
            coord.z >= 0 && coord.z < VoxelData.WorldSizeInChunks)
         {
-            return true; 
+            return true;
         }
         else
         {
             return false;
         }
     }
+   
+
 }
 
 [System.Serializable]
