@@ -12,15 +12,20 @@ public class World : MonoBehaviour
     public Material material;
     public Material transparentMaterial;
     public BlockType[] blockTypes;
-    Chunk[,] chunkMap = new Chunk[VoxelData.WorldSizeInChunks, VoxelData.WorldSizeInChunks];
 
+    Chunk[,] chunkMap = new Chunk[VoxelData.WorldSizeInChunks, VoxelData.WorldSizeInChunks];
     public List<ChunkCoord> activeChunks = new List<ChunkCoord>();
     public List<ChunkCoord> chunksToCreate = new List<ChunkCoord>();
-    private bool isCreatingChunks;
+    List<Chunk> chunksToUpdate = new List<Chunk>();
+    private bool applyingModifications = false;
+
     public ChunkCoord playerChunkCoord;
     ChunkCoord playerLastChunkCoord;
 
     public GameObject debugScreen;
+
+    // Modifications to a chunk (trees overlapping chunks)
+    Queue<VoxelMod> modifications = new Queue<VoxelMod>();
 
     private void Start()
     {
@@ -47,12 +52,22 @@ public class World : MonoBehaviour
             CheckViewDistance();
         }
 
-        if(chunksToCreate.Count > 0 && !isCreatingChunks)
+        if (modifications.Count > 0 && !applyingModifications)
         {
-            StartCoroutine("CreateChunks");
+            StartCoroutine(ApplyModifications());
         }
 
-        if(Input.GetKeyDown(KeyCode.Tab))
+        if(chunksToCreate.Count > 0)
+        {
+            CreateChunk();
+        }
+
+        if(chunksToUpdate.Count > 0)
+        {
+            UpdateChunks();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Tab))
         {
             debugScreen.SetActive(!debugScreen.activeSelf);
         }
@@ -72,26 +87,115 @@ public class World : MonoBehaviour
             }
         }
 
+        /// TODO: Everytime we are useing a queue, we need to ensure we are not adding to it elsewhere
+        /// Otherwise we may end up in an endless loop (perhaps lock the queue?)
+        while(modifications.Count > 0)
+        {
+            VoxelMod v = modifications.Dequeue();
+            ChunkCoord coord = GetChunkCoordFromVector3(v.position);
+
+            if (coord.x >= 0 && coord.x < VoxelData.WorldSizeInChunks && coord.z >= 0 && coord.z < VoxelData.WorldSizeInChunks)
+            {
+
+                // If a modification is occuring on a chunk that isnt genned, but on the border of one that is
+                // i.e. a tree on a genned chunk that has leaves on a non genned chunk
+                // gen that chunk
+                if (chunkMap[coord.x, coord.z] == null)
+                {
+                    chunkMap[coord.x, coord.z] = new Chunk(coord, this, true);
+                    activeChunks.Add(coord);
+                }
+
+                // Enqueueing into the chunk modifications, not the world modifications
+                chunkMap[coord.x, coord.z].modifications.Enqueue(v);
+
+                if (!chunksToUpdate.Contains(chunkMap[coord.x, coord.z]))
+                {
+                    chunksToUpdate.Add(chunkMap[coord.x, coord.z]);
+                }
+            }
+        }
+
+        for (int i = 0; i < chunksToUpdate.Count; i++)
+        {
+            chunksToUpdate[0].UpdateChunk();
+            chunksToUpdate.RemoveAt(0);
+        }
+
         player.position = spawnPosition;
     }
 
-    // coroutine to create chunks without freezing player
-    IEnumerator CreateChunks()
+    void CreateChunk()
     {
-        isCreatingChunks = true;
+        ChunkCoord coord = chunksToCreate[0];
+        chunksToCreate.RemoveAt(0);
+        activeChunks.Add(chunksToCreate[0]);
+        chunkMap[coord.x, coord.z].Init();
+    }
 
-        // while there are still chunks to create
-        while (chunksToCreate.Count > 0)
+    void UpdateChunks ()
+    {
+        bool updated = false;
+        int index = 0;
+
+        while (!updated && index < chunksToUpdate.Count-1)
         {
-            // Lists automatically push index up when an element is removed (1 becomes 0, 2 becomes 1, etc...)
-            // If we change from lists, we will need more logic to handle this
-            chunkMap[chunksToCreate[0].x, chunksToCreate[0].z].Init();
-            chunksToCreate.RemoveAt(0);
-            yield return null;
+            if (chunksToUpdate[index].isVoxelMapPopulated)
+            {
+                chunksToUpdate[index].UpdateChunk();
+                chunksToUpdate.RemoveAt(index);
+                updated = true;
+            }
+            else
+            {
+                index++;
+            }
+        }
+    }
+
+    IEnumerator ApplyModifications()
+    {
+        applyingModifications = true;
+        int count = 0;
+
+        while(modifications.Count > 0)
+        {
+            VoxelMod v = modifications.Dequeue();
+            ChunkCoord coord = GetChunkCoordFromVector3(v.position);
+
+            if (coord.x >= 0 && coord.x < VoxelData.WorldSizeInChunks && coord.z >= 0 && coord.z < VoxelData.WorldSizeInChunks)
+            {
+
+                // If a modification is occuring on a chunk that isnt genned, but on the border of one that is
+                // i.e. a tree on a genned chunk that has leaves on a non genned chunk
+                // gen that chunk
+                if (chunkMap[coord.x, coord.z] == null)
+                {
+                    chunkMap[coord.x, coord.z] = new Chunk(coord, this, true);
+                    activeChunks.Add(coord);
+                }
+
+                // Enqueueing into the chunk modifications, not the world modifications
+                chunkMap[coord.x, coord.z].modifications.Enqueue(v);
+
+                if (!chunksToUpdate.Contains(chunkMap[coord.x, coord.z]))
+                {
+                    chunksToUpdate.Add(chunkMap[coord.x, coord.z]);
+                }
+
+                count++;
+                // Only 200 voxel modifications per frame
+                if(count > 200)
+                {
+                    count = 0;
+                    yield return null;
+                }
+            }
         }
 
-        isCreatingChunks = false;
+        applyingModifications = false;
     }
+
 
     ChunkCoord GetChunkCoordFromVector3(Vector3 pos)
     {
@@ -253,6 +357,21 @@ public class World : MonoBehaviour
             }
         }
 
+        /* TREE PASS */ 
+
+        if (yPos == terrainHeight)
+        {
+            if(Noise.Get2DPerlin(new Vector2(pos.x, pos.z), 0, biome.treeZoneScale) > biome.treeZoneThreshold)
+            {
+                voxelValue = 5; // Made this dirt just to show where trees *can* spawn. Just remove to go back to grass
+
+                if(Noise.Get2DPerlin(new Vector2(pos.x, pos.z), 0, biome.treePlacementScale) > biome.treePlacementThreshold)
+                {
+                    Structure.MakeTree(pos, modifications, biome.maxTreeHeight, biome.minTreeHeight);
+                }
+            }
+        }
+
         return voxelValue;
     }
 
@@ -317,4 +436,24 @@ public class BlockType
 
         }
     }
+}
+
+//added for tress
+public class VoxelMod
+{
+    public Vector3 position;
+    public byte id;
+
+    public VoxelMod()
+    {
+        position = new Vector3();
+        id = 0;
+    }
+
+    public VoxelMod(Vector3 _position, byte _id)
+    {
+        position = _position;
+        id = _id;
+    }
+
 }

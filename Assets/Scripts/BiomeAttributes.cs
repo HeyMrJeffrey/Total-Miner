@@ -10,6 +10,20 @@ public class BiomeAttributes : ScriptableObject
     public int TerrainHeight; //Heighest Terrain Height, from the solidGroundHeight
     public float TerrainScale;
 
+    [Header("Trees")]
+    // The area where trees can spawn
+    public float treeZoneScale = 1.3f;
+    [Range(0.1f, 1f)]
+    public float treeZoneThreshold = 0.6f;
+
+    // How many trees do we put in this area?
+    public float treePlacementScale = 15f;
+    [Range(0.1f, 1f)]
+    public float treePlacementThreshold = 0.8f;
+
+    public int maxTreeHeight = 12;
+    public int minTreeHeight = 5;
+
     public Lode[] Lodes;
 }
 

@@ -19,7 +19,7 @@ public static class VoxelData
     // Needed to normalize texture sizes 
     // Allows for 16,32,64+ size textures
     // Texture atlas must be square for this impl
-    public static readonly int textureAtlasSizeInBlocks = 4;
+    public static readonly int textureAtlasSizeInBlocks = 32;
 
     // Get the distance between each texture
     // If 4x4 atlas, each block is .25
