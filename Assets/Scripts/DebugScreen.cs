@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,17 +27,20 @@ public class DebugScreen : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        string debugText = "DEBUG SCREEN";
-        debugText += "\n";
-        debugText += frameRate + "fps";
-        debugText += "\n";
-        debugText += "XYZ: " + Mathf.FloorToInt(world.player.transform.position.x) + "," + Mathf.FloorToInt(world.player.transform.position.y) + "," + Mathf.FloorToInt(world.player.transform.position.z);
-        debugText += "\n";
-        //Not sure wht this is giving a null reference exception.
-        //debugText += "CHUNK: " + world.playerChunkCoord.x + "," + world.playerChunkCoord.z;
+        StringBuilder tBuilt = new StringBuilder();
+        tBuilt.AppendLine("DEBUG INFO");
+        tBuilt.AppendLine($"FPS: {frameRate}");
+        tBuilt.AppendLine($"XYZ: {world.player.transform.position.ToString()}");
+
+        tBuilt.Append("CHUNK: ");
+        var currentChunk = world.GetChunkFromVector3(world.player.transform.position);
+        if (currentChunk == null)
+            tBuilt.AppendLine("NULL");
+        else
+            tBuilt.AppendLine(currentChunk.coord.ToString());
 
 
-        text.text = debugText;
+        text.text = tBuilt.ToString();
 
         if (timer > 1f)
         {
