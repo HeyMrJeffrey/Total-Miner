@@ -154,7 +154,7 @@ public class Chunk
 
                 //Chunk could be null if the position given is out of the world bounds.
                 if (targetChunk != null) 
-                    targetChunk.UpdateChunk();
+                    targetChunk.UpdateChunk(); //hopefully this isn't called more than once on the same chunk, otherwise we'd be wasting cpu time & resources.
             }
         }
     }
