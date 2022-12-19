@@ -33,8 +33,7 @@ public class Player : MonoBehaviour
     public float checkIncrement = 0.1f;
     public float reach = 8f;
 
-    // blocks you want to place
-    public byte selectedBlockIndex = 1;
+    public Toolbar toolbar;
 
     private void Start()
     {
@@ -46,27 +45,41 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
-        GetPlayerInput();
+        //GetPlayerInput();
+        //Removed this for the inventory system to prvent the player from moving while looking at their inventory.
+        //Do we want player input on update or fixed upate?
 
-        CalculateVelocity();
+        if (!world.inUI)
+        { 
+            CalculateVelocity();
 
-        if (jumpRequest)
-            Jump();
+            if (jumpRequest)
+                Jump();
 
-        // Rotate the entire character, not just the mouse
-        transform.Rotate(Vector3.up * mouseHorizontal * mouseSensitivity);
+            // Rotate the entire character, not just the mouse
+            transform.Rotate(Vector3.up * mouseHorizontal * mouseSensitivity);
 
-        // If we support mouse inversion, we change the -+ values here
-        camera.Rotate(Vector3.right * -mouseVertical * mouseSensitivity);
+            // If we support mouse inversion, we change the -+ values here
+            camera.Rotate(Vector3.right * -mouseVertical * mouseSensitivity);
 
-        // move player relative to the world
-        transform.Translate(velocity, Space.World);
+            // move player relative to the world
+            transform.Translate(velocity, Space.World);
+        }
     }
 
     private void Update()
     {
-        GetPlayerInput();
-        PlaceCursorBlocks();
+        /// TODO: make this button press programmable instead of hard codingto 'I'
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            world.inUI = !world.inUI;
+        }
+
+        if (!world.inUI)
+        {
+            GetPlayerInput();
+            PlaceCursorBlocks();
+        }
     }
 
     private void Jump ()
@@ -141,8 +154,13 @@ public class Player : MonoBehaviour
             // Right mouse click
             if (Input.GetMouseButtonDown(1))
             {
-                //Place Block
-                world.GetChunkFromVector3(placeBlock.position).EditVoxel(placeBlock.position, selectedBlockIndex);
+                // If there is an item selected
+                if (toolbar.slots[toolbar.slotIndex].HasItem)
+                {
+                    //Place Block
+                    world.GetChunkFromVector3(placeBlock.position).EditVoxel(placeBlock.position, toolbar.slots[toolbar.slotIndex].itemSlot.stack.id);
+                    toolbar.slots[toolbar.slotIndex].itemSlot.Take(1);
+                }
             }
         }
     }

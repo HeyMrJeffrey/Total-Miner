@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class World : MonoBehaviour
@@ -23,9 +24,14 @@ public class World : MonoBehaviour
     ChunkCoord playerLastChunkCoord;
 
     public GameObject debugScreen;
+    public GameObject creativeInventoryWindow;
+    public GameObject cursorSlot;
 
     // Modifications to a chunk (trees overlapping chunks)
     Queue<VoxelMod> modifications = new Queue<VoxelMod>();
+
+    // UI - Inventory
+    private bool _inUI = false;
 
     private void Start()
     {
@@ -33,7 +39,7 @@ public class World : MonoBehaviour
 
         spawnPosition = new Vector3(
                             (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f,
-                            VoxelData.ChunkHeight,
+                            VoxelData.ChunkHeight - 40,
                             (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f
                             );
         GenerateWorld();
@@ -288,6 +294,30 @@ public class World : MonoBehaviour
         }
 
         return blockTypes[GetVoxel(pos)].isTransparent;
+    }
+
+    public bool inUI
+    {
+        get
+        {
+            return _inUI;
+        }
+        set
+        {
+            _inUI = value;
+            if(_inUI)
+            { 
+                Cursor.lockState = CursorLockMode.None;
+                creativeInventoryWindow.SetActive(true);
+                cursorSlot.SetActive(true);
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                creativeInventoryWindow.SetActive(false);
+                cursorSlot.SetActive(false);
+            }
+        }
     }
 
 
