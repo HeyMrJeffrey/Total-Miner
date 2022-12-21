@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -27,6 +28,35 @@ public class World : MonoBehaviour
     public GameObject creativeInventoryWindow;
     public GameObject cursorSlot;
 
+
+    // TESTING THREADING STUPID SHIT.
+    public Thread chunkUpdateThread;
+    public async void chunkUpdateThreaded()
+    {
+        AutoResetEvent reset = new AutoResetEvent(false);
+        while (true)
+        {
+            // TESTING MULTITHREADING GETTING THE FUCKING COORDINATES
+            var targetCoord = new ChunkCoord(0, 0);
+            var targetChunk = GetChunkFromVector3(new Vector3(0, 0, 0));
+            if (targetChunk == null)
+            {
+                Debug.Log("TTT");
+            }
+            else
+            {
+                //var xxx = targetChunk.GetPositionAsync();
+                var x = await targetChunk.GetPositionAsync();
+               
+                var res = x;
+                Debug.Log(res.ToString());
+            }
+
+
+            reset.Reset();
+        }
+    }
+
     // Modifications to a chunk (trees overlapping chunks)
     Queue<VoxelMod> modifications = new Queue<VoxelMod>();
 
@@ -42,10 +72,19 @@ public class World : MonoBehaviour
                             VoxelData.ChunkHeight - 40,
                             (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f
                             );
+
+
         GenerateWorld();
+
+
 
         playerLastChunkCoord = playerChunkCoord = GetChunkCoordFromVector3(player.position);
         CheckViewDistance(); //temporary, just spawn immediate chunks instead, this is very hacky way of getting the initial chunks to load when the game starts
+
+
+        // TESTING THREADING SHIT
+        chunkUpdateThread = new Thread(chunkUpdateThreaded);
+        chunkUpdateThread.Start();
     }
 
     private void Update()

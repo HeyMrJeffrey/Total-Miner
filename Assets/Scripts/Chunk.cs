@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class Chunk
@@ -58,6 +60,9 @@ public class Chunk
         chunkObject.transform.position = new Vector3(coord.x * VoxelData.ChunkWidth,
                                                      0f,
                                                      coord.z * VoxelData.ChunkWidth);
+
+       
+
         chunkObject.name = "Chunk: " + coord.x + "," + coord.z;
         PopulateVoxelMap();
         UpdateChunk();
@@ -317,6 +322,17 @@ public class Chunk
     public Vector3 position
     {
         get { return chunkObject.transform.position; }
+    }
+
+    public Task<Vector3> GetPositionAsync()
+    {
+        return Task.Run<Vector3>(() =>
+        {
+            var result = new MainThreadQueue.Result<Transform>();
+            SingletonManager.MTQ.GetTransform(this.chunkObject, result);
+
+            return result.Value.position;
+        });
     }
 
     // textureID - where a texture occurs in the atlas
