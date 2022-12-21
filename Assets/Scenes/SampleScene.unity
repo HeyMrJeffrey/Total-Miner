@@ -595,7 +595,10 @@ MonoBehaviour:
     viewDistance: 5
     mouseSensitivity: 20
     seed: 9203847
-  biome: {fileID: 11400000, guid: 7e3476d71edc5c04c92147fd12a01301, type: 2}
+  biomes:
+  - {fileID: 11400000, guid: 7e3476d71edc5c04c92147fd12a01301, type: 2}
+  - {fileID: 11400000, guid: adcf482cac54cd7458a93a55926256c6, type: 2}
+  - {fileID: 11400000, guid: fe54d58540481da43bdc091c6580a6df, type: 2}
   player: {fileID: 436504672}
   spawnPosition: {x: 0, y: 0, z: 0}
   material: {fileID: 2100000, guid: 8edd078e0716ca346a60e1f294815629, type: 2}
@@ -721,6 +724,16 @@ MonoBehaviour:
     bottomFaceTexture: 8
     leftFaceTexture: 8
     rightFaceTexture: 8
+  - blockName: Cactus
+    isSolid: 1
+    isTransparent: 0
+    icon: {fileID: -1702422870, guid: 3fdfe3560afd4b146b99154775e42460, type: 3}
+    backFaceTexture: 151
+    frontFaceTexture: 151
+    topFaceTexture: 151
+    bottomFaceTexture: 151
+    leftFaceTexture: 151
+    rightFaceTexture: 151
   debugScreen: {fileID: 790394798}
   creativeInventoryWindow: {fileID: 836897520}
   cursorSlot: {fileID: 583701565}

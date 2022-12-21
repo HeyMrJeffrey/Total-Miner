@@ -5,24 +5,33 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "BiomeAttributes", menuName = "BasicBiome")]
 public class BiomeAttributes : ScriptableObject
 {
+    [Header("Biome Attributes")]
     public string BiomeName;
-    public int SolidGroundHeight;
+    public int offset;
+    public float scale;
+
     public int TerrainHeight; //Heighest Terrain Height, from the solidGroundHeight
     public float TerrainScale;
 
-    [Header("Trees")]
+    public byte surfaceBlock = 3;
+    public byte subSurfaceBlock = 5;
+
+    [Header("Major Flora")]
+    public int majorFloraIndex = 0;
     // The area where trees can spawn
-    public float treeZoneScale = 1.3f;
+    public float majorFloraZoneScale = 1.3f;
     [Range(0.1f, 1f)]
-    public float treeZoneThreshold = 0.6f;
+    public float majorFloraZoneThreshold = 0.6f;
 
     // How many trees do we put in this area?
-    public float treePlacementScale = 15f;
+    public float majorFloraPlacementScale = 15f;
     [Range(0.1f, 1f)]
-    public float treePlacementThreshold = 0.8f;
+    public float majorFloraPlacementThreshold = 0.8f;
 
-    public int maxTreeHeight = 12;
-    public int minTreeHeight = 5;
+    public bool placeMajorFlora = true;
+
+    public int maxHeight = 12;
+    public int minHeight = 5;
 
     public Lode[] Lodes;
 }

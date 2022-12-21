@@ -3278,7 +3278,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TP_OriginalHD_Icons_151
+      name: TP_OriginalHD_Icons_Cactus
       rect:
         serializedVersion: 2
         x: 1472
@@ -9187,7 +9187,7 @@ TextureImporter:
         width: 693
         height: 481
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -9219,7 +9219,6 @@ TextureImporter:
       TP_OriginalHD_Icons_414: -815197538
       TP_OriginalHD_Icons_130: -627173735
       TP_OriginalHD_Icons_155: 332471839
-      TP_OriginalHD_Icons_151: -1702422870
       TP_OriginalHD_Icons_205: 874272973
       TP_OriginalHD_Icons_186: 2124297593
       TP_OriginalHD_Icons_163: -864084672
@@ -9633,6 +9632,7 @@ TextureImporter:
       TP_OriginalHD_Icons_282: 373801199
       TP_OriginalHD_Icons_271: -1152310657
       TP_OriginalHD_Icons_125: 1132994418
+      TP_OriginalHD_Icons_Cactus: -1702422870
       TP_OriginalHD_Icons_114: -45692270
       TP_OriginalHD_Icons_31: -878945229
       TP_OriginalHD_Icons_120: -784447444

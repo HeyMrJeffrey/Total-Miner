@@ -4,6 +4,22 @@ using UnityEngine;
 
 public static class Structure
 {
+    public static void GenerateMajorFlora(int index, Vector3 position, Queue<VoxelMod> queue, int minTrunkHeight, int maxTrunkHeight)
+    {
+        switch (index)
+        {
+            case 0: //Grasslands
+                MakeTree(position, queue, minTrunkHeight, maxTrunkHeight);
+                break;
+            case 1: //Desert
+                MakeCacti(position, queue, minTrunkHeight, maxTrunkHeight);
+                break;
+            case 2: //Forest
+                MakeTree(position, queue, minTrunkHeight, maxTrunkHeight);
+                break;
+        }
+    }
+
     public static void MakeTree(Vector3 position, Queue<VoxelMod> queue, int minTrunkHeight, int maxTrunkHeight)
     {
         var noise = Noise.Get2DPerlin(new Vector2(position.x, position.z), 250f, 3f);
@@ -13,8 +29,6 @@ public static class Structure
         {
             height = minTrunkHeight;
         }
-
-        //Debug.Log($"Creating a tree at ({position.ToString()}) with a height of {height} (noise: {noise})");
 
         // All these for loops give the OG minecraft oak tree
         for(int i = 1; i < height; i++)
@@ -51,6 +65,23 @@ public static class Structure
             {
                 queue.Enqueue(new VoxelMod(new Vector3(position.x + x, position.y + height, position.z), 11));
             }
+        }
+    }
+
+    public static void MakeCacti(Vector3 position, Queue<VoxelMod> queue, int minTrunkHeight, int maxTrunkHeight)
+    {
+        var noise = Noise.Get2DPerlin(new Vector2(position.x, position.z), 10f, 2f);
+        int height = (int)(maxTrunkHeight * noise);
+
+        if (height < minTrunkHeight)
+        {
+            height = minTrunkHeight;
+        }
+
+        // All these for loops give the OG minecraft oak tree
+        for (int i = 1; i <= height; i++)
+        {
+            queue.Enqueue(new VoxelMod(new Vector3(position.x, (position.y + i), position.z), 12));
         }
     }
 }
