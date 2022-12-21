@@ -2,10 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using System.IO;
 
 public class World : MonoBehaviour
 {
-    public int seed;
+    public Settings settings;
+
     public BiomeAttributes biome;
 
     public Transform player;
@@ -35,7 +37,15 @@ public class World : MonoBehaviour
 
     private void Start()
     {
-        Random.InitState(seed);
+        // JSON EXPORT SETTINGS
+        //string jsonExport = JsonUtility.ToJson(settings);
+        //File.WriteAllText(Application.dataPath + "/settings.cfg", jsonExport);
+
+        // JSON IMPORT SETTINGS
+        string jsonImport = File.ReadAllText(Application.dataPath + "/settings.cfg");
+        settings = JsonUtility.FromJson<Settings>(jsonImport);
+
+        Random.InitState(settings.seed);
 
         spawnPosition = new Vector3(
                             (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f,
@@ -84,9 +94,9 @@ public class World : MonoBehaviour
     // These are chunk coordinates, NOT block coordinates
     void GenerateWorld()
     {
-        for (int x = (VoxelData.WorldSizeInChunks / 2) - VoxelData.ViewDistanceInChunks; x < (VoxelData.WorldSizeInChunks / 2) + VoxelData.ViewDistanceInChunks; x++)
+        for (int x = (VoxelData.WorldSizeInChunks / 2) - settings.viewDistance; x < (VoxelData.WorldSizeInChunks / 2) + settings.viewDistance; x++)
         {
-            for (int z = (VoxelData.WorldSizeInChunks / 2) - VoxelData.ViewDistanceInChunks; z < (VoxelData.WorldSizeInChunks / 2) + VoxelData.ViewDistanceInChunks; z++)
+            for (int z = (VoxelData.WorldSizeInChunks / 2) - settings.viewDistance; z < (VoxelData.WorldSizeInChunks / 2) + settings.viewDistance; z++)
             {
                 chunkMap[x, z] = new Chunk(new ChunkCoord(x, z), this, true);
                 activeChunks.Add(new ChunkCoord(x, z));
@@ -229,28 +239,30 @@ public class World : MonoBehaviour
         playerLastChunkCoord = coord;
         List<ChunkCoord> previouslyActiveChunks = new List<ChunkCoord>(activeChunks);
         activeChunks.Clear();
-        for (int x = coord.x - VoxelData.ViewDistanceInChunks; x < coord.x + VoxelData.ViewDistanceInChunks; x++)
+        for (int x = coord.x - settings.viewDistance; x < coord.x + settings.viewDistance; x++)
         {
-            for (int z = coord.z - VoxelData.ViewDistanceInChunks; z < coord.z + VoxelData.ViewDistanceInChunks; z++)
+            for (int z = coord.z - settings.viewDistance; z < coord.z + settings.viewDistance; z++)
             {
-                if (IsChunkInWorld(new ChunkCoord(x, z)))
+                ChunkCoord thisChunkCoord = new ChunkCoord(x, z);
+
+                if (IsChunkInWorld(thisChunkCoord))
                 {
                     //If the chunk hasn't been created at all, then let's create it.
                     if (chunkMap[x, z] == null)
                     {
-                        chunkMap[x, z] = new Chunk(new ChunkCoord(x, z), this, false);
-                        chunksToCreate.Add(new ChunkCoord(x, z));
+                        chunkMap[x, z] = new Chunk(thisChunkCoord, this, false);
+                        chunksToCreate.Add(thisChunkCoord);
                     }
                     else if (!(chunkMap[x, z].isActive))
                     {
                         chunkMap[x, z].isActive = true;
                     }
-                    activeChunks.Add(new ChunkCoord(x, z));
+                    activeChunks.Add(thisChunkCoord);
                 }
 
                 for (int i = 0; i < previouslyActiveChunks.Count; i++)
                 {
-                    if (previouslyActiveChunks[i].Equals(new ChunkCoord(x, z)))
+                    if (previouslyActiveChunks[i].Equals(thisChunkCoord))
                     {
                         previouslyActiveChunks.RemoveAt(i);
                     }
@@ -308,6 +320,7 @@ public class World : MonoBehaviour
             if(_inUI)
             { 
                 Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
                 creativeInventoryWindow.SetActive(true);
                 cursorSlot.SetActive(true);
             }
@@ -316,6 +329,7 @@ public class World : MonoBehaviour
                 Cursor.lockState = CursorLockMode.Locked;
                 creativeInventoryWindow.SetActive(false);
                 cursorSlot.SetActive(false);
+                Cursor.visible = false;
             }
         }
     }
@@ -471,7 +485,7 @@ public class BlockType
     }
 }
 
-//added for tress
+//added for trees
 public class VoxelMod
 {
     public Vector3 position;
@@ -489,4 +503,21 @@ public class VoxelMod
         id = _id;
     }
 
+}
+
+[System.Serializable]
+public class Settings
+{
+    [Header("Game Data")]
+    public string version;
+
+    [Header("Performance")]
+    public int viewDistance;
+
+    [Header("Controls")]
+    [Range(8f, 100f)]
+    public float mouseSensitivity;
+
+    [Header("World Generation")]
+    public int seed;
 }

@@ -22,6 +22,7 @@ public class Chunk
     List<int> transparentTriangles = new List<int>();
     Material[] materials = new Material[2];
     List<Vector2> uvs = new List<Vector2>();
+    List<Vector3> normals = new List<Vector3>();
 
     // Stores voxel data
     public byte[,,] voxelMap = new byte[VoxelData.ChunkWidth,
@@ -222,6 +223,13 @@ public class Chunk
                 vertices.Add(position + VoxelData.voxelVertices[VoxelData.voxelTriangles[currentFace, 2]]);
                 vertices.Add(position + VoxelData.voxelVertices[VoxelData.voxelTriangles[currentFace, 3]]);
 
+                // Calculate the normals
+                // Normals determine direction of a face
+                for(int i = 0; i < 4; i++)
+                {
+                    normals.Add(VoxelData.checkFaces[currentFace]);
+                }
+
                 AddTexture(world.blockTypes[blockID].GetTextureID(currentFace));
 
 
@@ -264,7 +272,8 @@ public class Chunk
 
         // Recalc Normals because each vertice has a direction (3 directions per vertice)
         // This is necessary to draw cube, calculate lighting, etc
-        mesh.RecalculateNormals();
+        //mesh.RecalculateNormals();
+        mesh.normals = normals.ToArray();
 
         // Update the mesh filter
         meshFilter.mesh = mesh;
@@ -277,6 +286,7 @@ public class Chunk
         triangles.Clear();
         transparentTriangles.Clear();
         uvs.Clear();
+        normals.Clear();
     }
 
     /*

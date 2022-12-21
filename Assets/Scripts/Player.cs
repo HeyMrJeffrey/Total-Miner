@@ -16,7 +16,6 @@ public class Player : MonoBehaviour
     public float playerHeight = 1.8f; // some avatars may need to change this value
     public float gravity = -5f;     // should gravity be a private static value?
     public float jumpForce = 5f;
-    public int mouseSensitivity = 25;
 
     public float playerWidth = 0.15f;   // using capsule collider so we dont need height
 
@@ -40,7 +39,7 @@ public class Player : MonoBehaviour
         camera = GameObject.Find("Main Camera").transform;
         world = GameObject.Find("World").GetComponent<World>();
 
-        Cursor.lockState = CursorLockMode.Locked;
+        world.inUI = false;
     }
 
     private void FixedUpdate()
@@ -57,10 +56,10 @@ public class Player : MonoBehaviour
                 Jump();
 
             // Rotate the entire character, not just the mouse
-            transform.Rotate(Vector3.up * mouseHorizontal * mouseSensitivity);
+            transform.Rotate(Vector3.up * mouseHorizontal * world.settings.mouseSensitivity);
 
             // If we support mouse inversion, we change the -+ values here
-            camera.Rotate(Vector3.right * -mouseVertical * mouseSensitivity);
+            camera.Rotate(Vector3.right * -mouseVertical * world.settings.mouseSensitivity);
 
             // move player relative to the world
             transform.Translate(velocity, Space.World);
@@ -122,6 +121,12 @@ public class Player : MonoBehaviour
 
     private void GetPlayerInput()
     {
+        // Specifically for testing a build
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
         mouseHorizontal = Input.GetAxis("Mouse X");
