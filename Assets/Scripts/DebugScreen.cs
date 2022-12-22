@@ -150,7 +150,7 @@ public class DebugScreen : MonoBehaviour
         else tmax.z = float.MaxValue;
 
         // Trace the primary ray
-        
+
         int i = 0;
 
         //Craig had used range squared, along with 
@@ -208,7 +208,7 @@ public class DebugScreen : MonoBehaviour
                 if (block > 0)
                 {
                     var ray = new Ray(pos, dir);
-                   
+
                     var box = GetBlockBox(p);
                     float dist = float.NaN;
                     if (box.IntersectRay(ray, out dist))
@@ -291,11 +291,11 @@ public class DebugScreen : MonoBehaviour
                         }
                     };
                     return bound;
-                    
+
                 }
         }
     }
-    
+
     public Vector3 GetBlockCenter(Vector3 point)
     {
         //This is to be expanded upon in the future.
@@ -312,14 +312,17 @@ public class DebugScreen : MonoBehaviour
             return 0; //Air
 
         var targetChunk = world.GetChunkFromVector3(pos);
+        if (targetChunk != null)
+        {
+            var blockPosInChunk = pos - targetChunk.position;
 
-        var blockPosInChunk = pos - targetChunk.position;
+            int xCheck = Mathf.FloorToInt(blockPosInChunk.x);
+            int yCheck = Mathf.FloorToInt(blockPosInChunk.y);
+            int zCheck = Mathf.FloorToInt(blockPosInChunk.z);
 
-        int xCheck = Mathf.FloorToInt(blockPosInChunk.x);
-        int yCheck = Mathf.FloorToInt(blockPosInChunk.y);
-        int zCheck = Mathf.FloorToInt(blockPosInChunk.z);
-
-        return targetChunk.voxelMap[xCheck, yCheck, zCheck];
+            return targetChunk.voxelMap[xCheck, yCheck, zCheck];
+        }
+        return 0; //Air
     }
 
     public BoundsInt GetMapBounds()

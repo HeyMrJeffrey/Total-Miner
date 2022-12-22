@@ -51,7 +51,7 @@ public class World : MonoBehaviour
             {
                 //var xxx = targetChunk.GetPositionAsync();
                 var x = await targetChunk.GetPositionAsync();
-               
+
                 var res = x;
                 Debug.Log(res.ToString());
             }
@@ -185,8 +185,9 @@ public class World : MonoBehaviour
     void CreateChunk()
     {
         ChunkCoord coord = chunksToCreate[0];
-        chunksToCreate.RemoveAt(0);
         activeChunks.Add(chunksToCreate[0]);
+
+        chunksToCreate.RemoveAt(0);
         chunkMap[coord.x, coord.z].Init();
     }
 
@@ -358,8 +359,8 @@ public class World : MonoBehaviour
         set
         {
             _inUI = value;
-            if(_inUI)
-            { 
+            if (_inUI)
+            {
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
                 creativeInventoryWindow.SetActive(true);
@@ -412,7 +413,7 @@ public class World : MonoBehaviour
 
         /* BIOME SELECTION PASS */
         int solidGroundHeight = 42;
-        float sumOfHeights = 0; 
+        float sumOfHeights = 0;
         int count = 0;
         float strongestWeight = 0;
         int strongestBiomeIndex = 0;
@@ -514,7 +515,7 @@ public class World : MonoBehaviour
             return false;
         }
     }
-   
+
 
 }
 
