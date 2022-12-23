@@ -80,7 +80,7 @@ public class Player : MonoBehaviour
         {
             if (!world.inInventory)
             {
-                NoesisView nv = GameObject.Find("Main Camera").GetComponent<NoesisView>();
+                Noesis.NoesisView nv = GameObject.Find("Main Camera").GetComponent<NoesisView>();
 
                 
 
