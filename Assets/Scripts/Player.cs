@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TotalMinerUnity;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,7 +9,7 @@ public class Player : MonoBehaviour
     public bool isGrounded;
     public bool isSprinting;
 
-    public Transform camera;
+    public Transform cameraTransform;
     private World world;
 
     public float walkSpeed = 3f;
@@ -34,9 +35,10 @@ public class Player : MonoBehaviour
 
     public Toolbar toolbar;
 
+
     private void Start()
     {
-        camera = GameObject.Find("Main Camera").transform;
+        cameraTransform = GameObject.Find("Main Camera").transform;
         world = GameObject.Find("World").GetComponent<World>();
 
         world.inUI = false;
@@ -59,7 +61,7 @@ public class Player : MonoBehaviour
             transform.Rotate(Vector3.up * mouseHorizontal * world.settings.mouseSensitivity);
 
             // If we support mouse inversion, we change the -+ values here
-            camera.Rotate(Vector3.right * -mouseVertical * world.settings.mouseSensitivity);
+            cameraTransform.Rotate(Vector3.right * -mouseVertical * world.settings.mouseSensitivity);
 
             // move player relative to the world
             transform.Translate(velocity, Space.World);
@@ -71,7 +73,29 @@ public class Player : MonoBehaviour
         /// TODO: make this button press programmable instead of hard codingto 'I'
         if (Input.GetKeyDown(KeyCode.I))
         {
-            world.inUI = !world.inUI;
+            world.inInventory = !world.inInventory;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (!world.inInventory)
+            {
+                var j = GameObject.Find("Main Camera").GetComponent<NoesisView>();
+
+                world.inPauseMenu = !world.inPauseMenu;
+                if (world.inPauseMenu)
+                {
+                    j.enabled = true;
+
+                }
+                else
+                {
+                    j.enabled = false;
+
+                }
+            }
+            else
+                world.inInventory = false;
         }
 
         if (!world.inUI)
@@ -79,6 +103,8 @@ public class Player : MonoBehaviour
             GetPlayerInput();
             PlaceCursorBlocks();
         }
+
+        
     }
 
     private void Jump ()
@@ -122,10 +148,10 @@ public class Player : MonoBehaviour
     private void GetPlayerInput()
     {
         // Specifically for testing a build
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Application.Quit();
-        }
+        //if (Input.GetKeyDown(KeyCode.Escape))
+        //{
+        //    Application.Quit();
+        //}
 
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
@@ -178,7 +204,7 @@ public class Player : MonoBehaviour
         
         while (step < reach)
         {
-            Vector3 pos = camera.position + (camera.forward * step);
+            Vector3 pos = cameraTransform.position + (cameraTransform.forward * step);
 
             if (world.CheckForVoxel(pos))
             {

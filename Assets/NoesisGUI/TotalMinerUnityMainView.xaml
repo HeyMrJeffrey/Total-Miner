@@ -1,0 +1,53 @@
+<UserControl
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:av="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="av" x:Class="TotalMinerUnity.TotalMinerUnityMainView" MinWidth="256" MinHeight="144" ClipToBounds="True">
+
+    <UserControl.Resources>
+    </UserControl.Resources>
+    
+    <Grid MinWidth="256" MinHeight="144">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3.3*"/>
+            <ColumnDefinition Width="6.6*"/>
+        </Grid.ColumnDefinitions>
+        
+        <Rectangle Grid.Column="0" Stroke="Black" Margin="10,10,0,10"/>
+        <Rectangle Grid.Column="1" Stroke="Black" Margin="0,10,10,10"/>
+        <Viewbox Grid.Column="0" Margin="0,10,0,10">
+            <ListBox Height="144" Width="76" Margin="6,6,6,28" Focusable="False">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel VerticalAlignment="Bottom"/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBoxItem Height="12" Padding="0,0,0,0" Visibility="Hidden" Focusable="False">
+                    <Viewbox Height="10" Width="76">
+                        <Button Content="Continue" Padding="0,0,0,0" BorderThickness="0" BorderBrush="{x:Null}" Width="368" FontSize="36" Style="{DynamicResource Style.ToolBar.Button}"/>
+                    </Viewbox>
+                </ListBoxItem>
+                <ListBoxItem Height="12" Padding="0,0,0,0" Visibility="Hidden" Focusable="False">
+                    <Viewbox Height="10" Width="76">
+                        <Button Content="Load Game" Padding="0,0,0,0" BorderThickness="0" BorderBrush="{x:Null}" Width="368" FontSize="36" Style="{DynamicResource Style.ToolBar.Button}"/>
+                    </Viewbox>
+                </ListBoxItem>
+                <ListBoxItem Height="12" Padding="0,0,0,0" Focusable="False">
+                    <Viewbox Height="10" Width="76">
+                        <Button Content="New Game" Padding="0,0,0,0" BorderThickness="0" BorderBrush="{x:Null}" Width="368" FontSize="36" Style="{DynamicResource Style.ToolBar.Button}"/>
+                    </Viewbox>
+                </ListBoxItem>
+                <ListBoxItem Height="12" Padding="0,0,0,0" Focusable="False">
+                    <Viewbox Height="10" Width="76">
+                        <Button Content="Settings" Padding="0,0,0,0" BorderThickness="0" BorderBrush="{x:Null}" Width="368" FontSize="36" Style="{DynamicResource Style.ToolBar.Button}"/>
+                    </Viewbox>
+                </ListBoxItem>
+                <ListBoxItem Height="12" Padding="0,0,0,0" Focusable="False">
+                    <Viewbox Height="10" Width="76">
+                        <Button Content="Exit" Padding="0,0,0,0" BorderThickness="0" BorderBrush="{x:Null}" Width="368" FontSize="36" Style="{DynamicResource Style.ToolBar.Button}"/>
+                    </Viewbox>
+                </ListBoxItem>
+
+            </ListBox>
+        </Viewbox>
+        <!--<Button Content="Button" Margin="300,200,300,195" MinWidth="50" MinHeight="30" av:IsHidden="True"/>-->
+    </Grid>
+</UserControl>
