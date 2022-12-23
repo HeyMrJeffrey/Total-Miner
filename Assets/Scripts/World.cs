@@ -27,6 +27,7 @@ public class World : MonoBehaviour
     public List<ChunkCoord> chunksToCreate = new List<ChunkCoord>();
 
     List<Chunk> chunksToUpdate = new List<Chunk>();
+    List<Chunk> chunksToAddToUpdateList = new List<Chunk>();
     object chunksToUpdateLock = new object();
 
     private bool applyingModifications = false;
@@ -47,24 +48,19 @@ public class World : MonoBehaviour
         //AutoResetEvent reset = new AutoResetEvent(false);
         while (true)
         {
-            // TESTING MULTITHREADING GETTING THE FUCKING COORDINATES
-            //var transformResult = new MainThreadQueue.Result<Transform>();
-            //SingletonManager.MTQ.GetTransform(targetChunk.chunkObject, transformResult);
-            //var transform = transformResult.Value;
-
-            //var positionResult = new MainThreadQueue.Result<Vector3>();
-            //SingletonManager.MTQ.GetPositionFromTransform(transform, positionResult);
-            //var position = positionResult.Value;
-
-            //var pos = position;
-            //Debug.Log(pos.ToString());
+            for (int i = 0; i < chunksToAddToUpdateList.Count; i++)
+            {
+                var targetChunk = chunksToAddToUpdateList[0];
+                chunksToAddToUpdateList.RemoveAt(0);
+                chunksToUpdate.Add(targetChunk);
+            }
 
             bool updated = false;
             int index = 0;
 
             lock (chunksToUpdateLock)
             {
-                while (!updated && index < chunksToUpdate.Count - 1)
+                while (!updated && index <= chunksToUpdate.Count - 1)
                 {
                     if (chunksToUpdate[index].isVoxelMapPopulated)
                     {
@@ -74,7 +70,7 @@ public class World : MonoBehaviour
                         MainThreadQueue.Result<Vector3> positionResult = new MainThreadQueue.Result<Vector3>();
                         SingletonManager.MTQ.GetPositionFromGameObject(chunksToUpdate[index].chunkObject, positionResult);
                         updateData.ChunkPosition = positionResult.Value;
-                        
+
                         updateData.Valid = true;
 
                         try
@@ -96,7 +92,7 @@ public class World : MonoBehaviour
                 }
             }
             System.Threading.Thread.Sleep(1);
-           // reset.Set();
+            // reset.Set();
         }
     }
     // Modifications to a chunk (trees overlapping chunks)
@@ -246,36 +242,36 @@ public class World : MonoBehaviour
     {
         if (Multithreading)
             return;
-        
+
         bool updated = false;
-        
+
         int index = 0;
 
 
-        
+
         while (!updated && index < chunksToUpdate.Count - 1)
-        
-            {
-        
+
+        {
+
             if (chunksToUpdate[index].isVoxelMapPopulated)
-        
-                {
-        
-                chunksToUpdate[index].UpdateChunk();
-        
-                chunksToUpdate.RemoveAt(index);
-        
-                updated = true;
-        
-                }
-        
-            else
-        
+
             {
-        
+
+                chunksToUpdate[index].UpdateChunk();
+
+                chunksToUpdate.RemoveAt(index);
+
+                updated = true;
+
+            }
+
+            else
+
+            {
+
                 index++;
-        
-                }
+
+            }
         }
     }
 
@@ -428,7 +424,7 @@ public class World : MonoBehaviour
             {
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
-                
+
             }
             else
             {
@@ -469,7 +465,7 @@ public class World : MonoBehaviour
         }
         set
         {
-            
+
             if (value)
             {
                 inPauseMenu = false;
@@ -477,7 +473,7 @@ public class World : MonoBehaviour
                 _inInventory = true;
                 creativeInventoryWindow.SetActive(true);
                 cursorSlot.SetActive(true);
-                
+
             }
             else
             {
@@ -629,45 +625,17 @@ public class World : MonoBehaviour
         }
     }
 
-    public bool IsChunkInUpdateList(Chunk chunk)
-    {
-        bool value = false;
-        lock (chunksToUpdateLock)
-        {
-            value = chunksToUpdate.Contains(chunk);
-        }
-        return value;
-    }
     public bool AddChunkToUpdateList(Chunk chunk)
     {
         bool value = false;
-        lock (chunksToUpdateLock)
-        {
-            if (chunksToUpdate.Contains(chunk))
-                value = false;
-            else
-            {
-                chunksToUpdate.Add(chunk);
-                value = true;
-            }
-        }
 
-        return value;
-    }
-    public bool RemoveChunkFromUpdateList(Chunk chunk)
-    {
-        bool value = false;
-        lock (chunksToUpdateLock)
+        if (chunksToUpdate.Contains(chunk) || chunksToAddToUpdateList.Contains(chunk))
+            value = false;
+        else
         {
-            if (!chunksToUpdate.Contains(chunk))
-                value = false;
-            else
-            {
-                chunksToUpdate.Remove(chunk);
-                value = true;
-            }
+            chunksToAddToUpdateList.Add(chunk);
+            value = true;
         }
-
         return value;
     }
 }

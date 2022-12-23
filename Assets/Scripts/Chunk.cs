@@ -79,7 +79,8 @@ public class Chunk
 
         chunkObject.name = "Chunk: " + coord.x + "," + coord.z;
         PopulateVoxelMap();
-        UpdateChunk();
+        //UpdateChunk();
+        world.AddChunkToUpdateList(this);
     }
 
     //Populates the voxels within a chunk
