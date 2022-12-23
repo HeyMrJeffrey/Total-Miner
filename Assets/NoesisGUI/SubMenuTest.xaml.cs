@@ -1,4 +1,4 @@
-#if UNITY_5_3_OR_NEWER
+﻿#if UNITY_5_3_OR_NEWER
 #define NOESIS
 using Noesis;
 #else
@@ -9,11 +9,11 @@ using System.Windows.Controls;
 namespace TotalMinerUnity
 {
     /// <summary>
-    /// Interaction logic for TotalMinerUnityMainView.xaml
+    /// Interaction logic for SubMenuTest.xaml
     /// </summary>
-    public partial class TotalMinerUnityMainView : UserControl
+    public partial class SubMenuTest : UserControl
     {
-        public TotalMinerUnityMainView()
+        public SubMenuTest()
         {
             InitializeComponent();
         }
@@ -21,7 +21,6 @@ namespace TotalMinerUnity
 #if NOESIS
         private void InitializeComponent()
         {
-            
             NoesisUnity.LoadComponent(this);
         }
 #endif

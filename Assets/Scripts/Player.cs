@@ -80,17 +80,23 @@ public class Player : MonoBehaviour
         {
             if (!world.inInventory)
             {
-                var j = GameObject.Find("Main Camera").GetComponent<NoesisView>();
+                NoesisView nv = GameObject.Find("Main Camera").GetComponent<NoesisView>();
+
+                
 
                 world.inPauseMenu = !world.inPauseMenu;
                 if (world.inPauseMenu)
                 {
-                    j.enabled = true;
+                    nv.enabled = true;
 
                 }
                 else
                 {
-                    j.enabled = false;
+                    //var j = new SubMenuTest();
+                    //
+                    //nv.Xaml.uri = "SubMenuTest";
+                    //nv.LoadXaml(false);
+                    nv.enabled = false;
 
                 }
             }
