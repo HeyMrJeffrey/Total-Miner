@@ -18,6 +18,7 @@ namespace TotalMinerUnity
             InitializeComponent();
         }
 
+
 #if NOESIS
         private void InitializeComponent()
         {

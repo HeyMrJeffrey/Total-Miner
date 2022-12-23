@@ -58,66 +58,66 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\2022.2.1f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="C:\Users\Rocko\Documents\Visual Studio 2022\Projects\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisMenuBlend.cs">
+    <Compile Include="C:\CDRIVE_Development\Gits\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisMenuBlend.cs">
       <Link>Editor\NoesisMenuBlend.cs</Link>
     </Compile>
-    <Compile Include="C:\Users\Rocko\Documents\Visual Studio 2022\Projects\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisFontImporter.cs">
+    <Compile Include="C:\CDRIVE_Development\Gits\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisFontImporter.cs">
       <Link>Editor\NoesisFontImporter.cs</Link>
     </Compile>
-    <Compile Include="C:\Users\Rocko\Documents\Visual Studio 2022\Projects\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisXamlEditor.cs">
+    <Compile Include="C:\CDRIVE_Development\Gits\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisXamlEditor.cs">
       <Link>Editor\NoesisXamlEditor.cs</Link>
     </Compile>
-    <Compile Include="C:\Users\Rocko\Documents\Visual Studio 2022\Projects\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisShaderImporter.cs">
+    <Compile Include="C:\CDRIVE_Development\Gits\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisShaderImporter.cs">
       <Link>Editor\NoesisShaderImporter.cs</Link>
     </Compile>
-    <Compile Include="C:\Users\Rocko\Documents\Visual Studio 2022\Projects\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisShaderEditor.cs">
+    <Compile Include="C:\CDRIVE_Development\Gits\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisShaderEditor.cs">
       <Link>Editor\NoesisShaderEditor.cs</Link>
     </Compile>
-    <Compile Include="C:\Users\Rocko\Documents\Visual Studio 2022\Projects\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisUpdater.cs">
+    <Compile Include="C:\CDRIVE_Development\Gits\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisUpdater.cs">
       <Link>Editor\NoesisUpdater.cs</Link>
     </Compile>
-    <Compile Include="C:\Users\Rocko\Documents\Visual Studio 2022\Projects\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisFontEditor.cs">
+    <Compile Include="C:\CDRIVE_Development\Gits\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisFontEditor.cs">
       <Link>Editor\NoesisFontEditor.cs</Link>
     </Compile>
-    <Compile Include="C:\Users\Rocko\Documents\Visual Studio 2022\Projects\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisWelcome.cs">
+    <Compile Include="C:\CDRIVE_Development\Gits\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisWelcome.cs">
       <Link>Editor\NoesisWelcome.cs</Link>
     </Compile>
-    <Compile Include="C:\Users\Rocko\Documents\Visual Studio 2022\Projects\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisPostprocessor.cs">
+    <Compile Include="C:\CDRIVE_Development\Gits\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisPostprocessor.cs">
       <Link>Editor\NoesisPostprocessor.cs</Link>
     </Compile>
-    <Compile Include="C:\Users\Rocko\Documents\Visual Studio 2022\Projects\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisSettingsBuildProvider.cs">
+    <Compile Include="C:\CDRIVE_Development\Gits\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisSettingsBuildProvider.cs">
       <Link>Editor\NoesisSettingsBuildProvider.cs</Link>
     </Compile>
-    <Compile Include="C:\Users\Rocko\Documents\Visual Studio 2022\Projects\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisMenu.cs">
+    <Compile Include="C:\CDRIVE_Development\Gits\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisMenu.cs">
       <Link>Editor\NoesisMenu.cs</Link>
     </Compile>
-    <Compile Include="C:\Users\Rocko\Documents\Visual Studio 2022\Projects\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisXamlImporter.cs">
+    <Compile Include="C:\CDRIVE_Development\Gits\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisXamlImporter.cs">
       <Link>Editor\NoesisXamlImporter.cs</Link>
     </Compile>
-    <Compile Include="C:\Users\Rocko\Documents\Visual Studio 2022\Projects\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisReview.cs">
+    <Compile Include="C:\CDRIVE_Development\Gits\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisReview.cs">
       <Link>Editor\NoesisReview.cs</Link>
     </Compile>
-    <Compile Include="C:\Users\Rocko\Documents\Visual Studio 2022\Projects\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisAbout.cs">
+    <Compile Include="C:\CDRIVE_Development\Gits\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisAbout.cs">
       <Link>Editor\NoesisAbout.cs</Link>
     </Compile>
-    <Compile Include="C:\Users\Rocko\Documents\Visual Studio 2022\Projects\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisViewEditor.cs">
+    <Compile Include="C:\CDRIVE_Development\Gits\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisViewEditor.cs">
       <Link>Editor\NoesisViewEditor.cs</Link>
     </Compile>
-    <Compile Include="C:\Users\Rocko\Documents\Visual Studio 2022\Projects\NoesisGUI-Unity-3.1.6-Indie\Editor\GoogleAnalyticsHelper.cs">
+    <Compile Include="C:\CDRIVE_Development\Gits\NoesisGUI-Unity-3.1.6-Indie\Editor\GoogleAnalyticsHelper.cs">
       <Link>Editor\GoogleAnalyticsHelper.cs</Link>
     </Compile>
-    <Compile Include="C:\Users\Rocko\Documents\Visual Studio 2022\Projects\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisSettingsEditor.cs">
+    <Compile Include="C:\CDRIVE_Development\Gits\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisSettingsEditor.cs">
       <Link>Editor\NoesisSettingsEditor.cs</Link>
     </Compile>
-    <Compile Include="C:\Users\Rocko\Documents\Visual Studio 2022\Projects\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisVersion.cs">
+    <Compile Include="C:\CDRIVE_Development\Gits\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisVersion.cs">
       <Link>Editor\NoesisVersion.cs</Link>
     </Compile>
-    <Compile Include="C:\Users\Rocko\Documents\Visual Studio 2022\Projects\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisEditor.cs">
+    <Compile Include="C:\CDRIVE_Development\Gits\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisEditor.cs">
       <Link>Editor\NoesisEditor.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="C:\Users\Rocko\Documents\Visual Studio 2022\Projects\NoesisGUI-Unity-3.1.6-Indie\Editor\Noesis.NoesisGUI.Editor.asmdef">
+    <None Include="C:\CDRIVE_Development\Gits\NoesisGUI-Unity-3.1.6-Indie\Editor\Noesis.NoesisGUI.Editor.asmdef">
       <Link>Editor\Noesis.NoesisGUI.Editor.asmdef</Link>
     </None>
   </ItemGroup>

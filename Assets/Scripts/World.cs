@@ -25,7 +25,10 @@ public class World : MonoBehaviour
     Chunk[,] chunkMap = new Chunk[VoxelData.WorldSizeInChunks, VoxelData.WorldSizeInChunks];
     public List<ChunkCoord> activeChunks = new List<ChunkCoord>();
     public List<ChunkCoord> chunksToCreate = new List<ChunkCoord>();
+
     List<Chunk> chunksToUpdate = new List<Chunk>();
+    object chunksToUpdateLock = new object();
+
     private bool applyingModifications = false;
 
     public ChunkCoord playerChunkCoord;
@@ -41,7 +44,7 @@ public class World : MonoBehaviour
 
     public void chunkUpdateThreaded()
     {
-        AutoResetEvent reset = new AutoResetEvent(false);
+        //AutoResetEvent reset = new AutoResetEvent(false);
         while (true)
         {
             // TESTING MULTITHREADING GETTING THE FUCKING COORDINATES
@@ -59,7 +62,7 @@ public class World : MonoBehaviour
             bool updated = false;
             int index = 0;
 
-            lock (chunksToUpdate)
+            lock (chunksToUpdateLock)
             {
                 while (!updated && index < chunksToUpdate.Count - 1)
                 {
@@ -70,8 +73,8 @@ public class World : MonoBehaviour
                         //Get the chunkobject's position
                         MainThreadQueue.Result<Vector3> positionResult = new MainThreadQueue.Result<Vector3>();
                         SingletonManager.MTQ.GetPositionFromGameObject(chunksToUpdate[index].chunkObject, positionResult);
-                        updateData.ChunkPosition = positionResult.Value; //NOTE: May need to wait on IsReady?  Call Wait if so, not sure tho
-
+                        updateData.ChunkPosition = positionResult.Value;
+                        
                         updateData.Valid = true;
 
                         try
@@ -93,7 +96,7 @@ public class World : MonoBehaviour
                 }
             }
             System.Threading.Thread.Sleep(1);
-            reset.Set();
+           // reset.Set();
         }
     }
     // Modifications to a chunk (trees overlapping chunks)
@@ -147,7 +150,7 @@ public class World : MonoBehaviour
     {
         playerChunkCoord = GetChunkCoordFromVector3(player.position);
 
-        SingletonManager.MTQ.Execute(1);
+        SingletonManager.MTQ.Execute(5);
 
         //Only update the chunks if the player has moved from the chunk they were previously on.
         if (!playerChunkCoord.Equals(playerLastChunkCoord))
@@ -157,7 +160,7 @@ public class World : MonoBehaviour
 
         if (modifications.Count > 0 && !applyingModifications)
         {
-            StartCoroutine(ApplyModifications());
+            //StartCoroutine(ApplyModifications());
         }
 
         if (chunksToCreate.Count > 0)
@@ -216,7 +219,7 @@ public class World : MonoBehaviour
             }
         }
 
-        lock (chunksToUpdate)
+        lock (chunksToUpdateLock)
         {
             for (int i = 0; i < chunksToUpdate.Count; i++)
             {
@@ -629,7 +632,7 @@ public class World : MonoBehaviour
     public bool IsChunkInUpdateList(Chunk chunk)
     {
         bool value = false;
-        lock (chunksToUpdate)
+        lock (chunksToUpdateLock)
         {
             value = chunksToUpdate.Contains(chunk);
         }
@@ -638,7 +641,7 @@ public class World : MonoBehaviour
     public bool AddChunkToUpdateList(Chunk chunk)
     {
         bool value = false;
-        lock (chunksToUpdate)
+        lock (chunksToUpdateLock)
         {
             if (chunksToUpdate.Contains(chunk))
                 value = false;
@@ -654,7 +657,7 @@ public class World : MonoBehaviour
     public bool RemoveChunkFromUpdateList(Chunk chunk)
     {
         bool value = false;
-        lock (chunksToUpdate)
+        lock (chunksToUpdateLock)
         {
             if (!chunksToUpdate.Contains(chunk))
                 value = false;

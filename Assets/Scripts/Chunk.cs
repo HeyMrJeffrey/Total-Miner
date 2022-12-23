@@ -343,6 +343,7 @@ public class Chunk
         {
             MainThreadQueue.Result result = new MainThreadQueue.Result();
             SingletonManager.MTQ.RunAction(applyMeshData, result);
+            result.Wait();
         }
         else
             applyMeshData();
