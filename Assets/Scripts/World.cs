@@ -5,9 +5,12 @@ using Unity.VisualScripting;
 using UnityEngine;
 using System.IO;
 using UnityEngine.XR;
+using System;
 
 public class World : MonoBehaviour
 {
+    public bool Multithreading = false;
+
     public Settings settings;
 
     [Header("World Generation Values")]
@@ -35,32 +38,63 @@ public class World : MonoBehaviour
 
     // TESTING THREADING STUPID SHIT.
     public Thread chunkUpdateThread;
-    public async void chunkUpdateThreaded()
+
+    public void chunkUpdateThreaded()
     {
         AutoResetEvent reset = new AutoResetEvent(false);
         while (true)
         {
             // TESTING MULTITHREADING GETTING THE FUCKING COORDINATES
-            var targetCoord = new ChunkCoord(0, 0);
-            var targetChunk = GetChunkFromVector3(new Vector3(0, 0, 0));
-            if (targetChunk == null)
+            //var transformResult = new MainThreadQueue.Result<Transform>();
+            //SingletonManager.MTQ.GetTransform(targetChunk.chunkObject, transformResult);
+            //var transform = transformResult.Value;
+
+            //var positionResult = new MainThreadQueue.Result<Vector3>();
+            //SingletonManager.MTQ.GetPositionFromTransform(transform, positionResult);
+            //var position = positionResult.Value;
+
+            //var pos = position;
+            //Debug.Log(pos.ToString());
+
+            bool updated = false;
+            int index = 0;
+
+            lock (chunksToUpdate)
             {
-                Debug.Log("TTT");
+                while (!updated && index < chunksToUpdate.Count - 1)
+                {
+                    if (chunksToUpdate[index].isVoxelMapPopulated)
+                    {
+                        Chunk.chunkUpdateThreadData updateData = default;
+
+                        //Get the chunkobject's position
+                        MainThreadQueue.Result<Vector3> positionResult = new MainThreadQueue.Result<Vector3>();
+                        SingletonManager.MTQ.GetPositionFromGameObject(chunksToUpdate[index].chunkObject, positionResult);
+                        updateData.ChunkPosition = positionResult.Value;
+
+                        updateData.Valid = true;
+
+                        try
+                        {
+                            chunksToUpdate[index].UpdateChunk(updateData);
+
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+                        chunksToUpdate.RemoveAt(index);
+                        updated = true;
+                    }
+                    else
+                    {
+                        index++;
+                    }
+                }
             }
-            else
-            {
-                //var xxx = targetChunk.GetPositionAsync();
-                var x = await targetChunk.GetPositionAsync();
-
-                var res = x;
-                Debug.Log(res.ToString());
-            }
-
-
-            reset.Reset();
+            reset.Set();
         }
     }
-
     // Modifications to a chunk (trees overlapping chunks)
     Queue<VoxelMod> modifications = new Queue<VoxelMod>();
 
@@ -77,7 +111,8 @@ public class World : MonoBehaviour
         string jsonImport = File.ReadAllText(Application.dataPath + "/settings.cfg");
         settings = JsonUtility.FromJson<Settings>(jsonImport);
 
-        Random.InitState(settings.seed);
+        UnityEngine.Random.InitState(settings.seed);
+        SingletonManager.MTQ = new MainThreadQueue();
 
         spawnPosition = new Vector3(
                             (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f,
@@ -94,14 +129,20 @@ public class World : MonoBehaviour
         CheckViewDistance(); //temporary, just spawn immediate chunks instead, this is very hacky way of getting the initial chunks to load when the game starts
 
 
+
         // TESTING THREADING SHIT
-        // chunkUpdateThread = new Thread(chunkUpdateThreaded);
-        // chunkUpdateThread.Start();
+        if (Multithreading)
+        {
+            chunkUpdateThread = new Thread(chunkUpdateThreaded);
+            chunkUpdateThread.Start();
+        }
     }
 
     private void Update()
     {
         playerChunkCoord = GetChunkCoordFromVector3(player.position);
+
+        SingletonManager.MTQ.Execute(1);
 
         //Only update the chunks if the player has moved from the chunk they were previously on.
         if (!playerChunkCoord.Equals(playerLastChunkCoord))
@@ -119,7 +160,7 @@ public class World : MonoBehaviour
             CreateChunk();
         }
 
-        if (chunksToUpdate.Count > 0)
+        if (chunksToUpdate.Count > 0 && !Multithreading)
         {
             UpdateChunks();
         }
@@ -166,17 +207,17 @@ public class World : MonoBehaviour
                 // Enqueueing into the chunk modifications, not the world modifications
                 chunkMap[coord.x, coord.z].modifications.Enqueue(v);
 
-                if (!chunksToUpdate.Contains(chunkMap[coord.x, coord.z]))
-                {
-                    chunksToUpdate.Add(chunkMap[coord.x, coord.z]);
-                }
+                AddChunkToUpdateList(chunkMap[coord.x, coord.z]);
             }
         }
 
-        for (int i = 0; i < chunksToUpdate.Count; i++)
+        lock (chunksToUpdate)
         {
-            chunksToUpdate[0].UpdateChunk();
-            chunksToUpdate.RemoveAt(0);
+            for (int i = 0; i < chunksToUpdate.Count; i++)
+            {
+                chunksToUpdate[0].UpdateChunk(default);
+                chunksToUpdate.RemoveAt(0);
+            }
         }
 
         player.position = spawnPosition;
@@ -193,21 +234,38 @@ public class World : MonoBehaviour
 
     void UpdateChunks()
     {
+        if (Multithreading)
+            return;
+        
         bool updated = false;
+        
         int index = 0;
 
+
+        
         while (!updated && index < chunksToUpdate.Count - 1)
-        {
+        
+            {
+        
             if (chunksToUpdate[index].isVoxelMapPopulated)
-            {
+        
+                {
+        
                 chunksToUpdate[index].UpdateChunk();
+        
                 chunksToUpdate.RemoveAt(index);
+        
                 updated = true;
-            }
+        
+                }
+        
             else
+        
             {
+        
                 index++;
-            }
+        
+                }
         }
     }
 
@@ -236,10 +294,7 @@ public class World : MonoBehaviour
                 // Enqueueing into the chunk modifications, not the world modifications
                 chunkMap[coord.x, coord.z].modifications.Enqueue(v);
 
-                if (!chunksToUpdate.Contains(chunkMap[coord.x, coord.z]))
-                {
-                    chunksToUpdate.Add(chunkMap[coord.x, coord.z]);
-                }
+                AddChunkToUpdateList(chunkMap[coord.x, coord.z]);
 
                 count++;
                 // Only 200 voxel modifications per frame
@@ -335,7 +390,7 @@ public class World : MonoBehaviour
         return blockTypes[GetVoxel(pos)].isSolid;
     }
 
-    public bool CheckIfVoxelTransparent(Vector3 pos)
+    public bool CheckIfVoxelTransparent(Vector3 pos, Chunk.chunkUpdateThreadData threadedData = default)
     {
         ChunkCoord thisChunk = new ChunkCoord(pos);
 
@@ -344,7 +399,7 @@ public class World : MonoBehaviour
 
         if (chunkMap[thisChunk.x, thisChunk.z] != null && chunkMap[thisChunk.x, thisChunk.z].isVoxelMapPopulated)
         {
-            return blockTypes[chunkMap[thisChunk.x, thisChunk.z].GetVoxelFromGlobalVector3(pos)].isTransparent;
+            return blockTypes[chunkMap[thisChunk.x, thisChunk.z].GetVoxelFromGlobalVector3(pos, threadedData)].isTransparent;
         }
 
         return blockTypes[GetVoxel(pos)].isTransparent;
@@ -516,7 +571,47 @@ public class World : MonoBehaviour
         }
     }
 
+    public bool IsChunkInUpdateList(Chunk chunk)
+    {
+        bool value = false;
+        lock (chunksToUpdate)
+        {
+            value = chunksToUpdate.Contains(chunk);
+        }
+        return value;
+    }
+    public bool AddChunkToUpdateList(Chunk chunk)
+    {
+        bool value = false;
+        lock (chunksToUpdate)
+        {
+            if (chunksToUpdate.Contains(chunk))
+                value = false;
+            else
+            {
+                chunksToUpdate.Add(chunk);
+                value = true;
+            }
+        }
 
+        return value;
+    }
+    public bool RemoveChunkFromUpdateList(Chunk chunk)
+    {
+        bool value = false;
+        lock (chunksToUpdate)
+        {
+            if (!chunksToUpdate.Contains(chunk))
+                value = false;
+            else
+            {
+                chunksToUpdate.Remove(chunk);
+                value = true;
+            }
+        }
+
+        return value;
+    }
 }
 
 [System.Serializable]
