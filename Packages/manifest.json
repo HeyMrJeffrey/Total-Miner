@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.noesis.noesisgui": "file:C:/Users/Rocko/Documents/Visual Studio 2022/Projects/NoesisGUI-Unity-3.1.6-Indie",
+    "com.noesis.noesisgui": "file:../../NoesisGUI-Unity-3.1.6-Indie",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.ai.navigation": "1.1.1",
     "com.unity.collab-proxy": "1.17.7",

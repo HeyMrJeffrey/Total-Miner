@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.noesis.noesisgui": {
-      "version": "file:C:/Users/Rocko/Documents/Visual Studio 2022/Projects/NoesisGUI-Unity-3.1.6-Indie",
+      "version": "file:../../NoesisGUI-Unity-3.1.6-Indie",
       "depth": 0,
       "source": "local",
       "dependencies": {
