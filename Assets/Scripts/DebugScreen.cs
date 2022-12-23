@@ -44,7 +44,7 @@ public class DebugScreen : MonoBehaviour
         tBuilt.AppendLine($"BELOW: {GetVoxelFromVector3(belowVector)}");
 
         //Let's show the user in the debug screen which block they are looking at and details about it (ID, position, distance)
-        HitTest rc = CalculateHitTest(playerScript.camera.position, playerScript.camera.forward, playerScript.reach);
+        HitTest rc = CalculateHitTest(playerScript.cameraTransform.position, playerScript.cameraTransform.forward, playerScript.reach);
 
         if (rc.IsValid)
             tBuilt.AppendLine($"RC: POS ({rc.Point.ToString()}), ID: {GetVoxelFromVector3(rc.Point)}, DIST: {rc.Distance}");

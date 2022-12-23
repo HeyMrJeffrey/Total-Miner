@@ -101,6 +101,9 @@ public class World : MonoBehaviour
 
     // UI - Inventory
     private bool _inUI = false;
+    private bool _inPauseMenu = false;
+    private bool _inInventory = false;
+
 
     private void Start()
     {
@@ -227,11 +230,13 @@ public class World : MonoBehaviour
 
     void CreateChunk()
     {
-        ChunkCoord coord = chunksToCreate[0];
-        activeChunks.Add(chunksToCreate[0]);
-
-        chunksToCreate.RemoveAt(0);
-        chunkMap[coord.x, coord.z].Init();
+        if (chunksToCreate.Count > 0)
+        {
+            ChunkCoord coord = chunksToCreate[0];
+            chunksToCreate.RemoveAt(0);
+            activeChunks.Add(coord);
+            chunkMap[coord.x, coord.z].Init();
+        }
     }
 
     void UpdateChunks()
@@ -420,15 +425,63 @@ public class World : MonoBehaviour
             {
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
-                creativeInventoryWindow.SetActive(true);
-                cursorSlot.SetActive(true);
+                
             }
             else
             {
                 Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+        }
+    }
+
+    public bool inPauseMenu
+    {
+        get
+        {
+            return _inPauseMenu;
+        }
+        set
+        {
+            if (value)
+            {
+                inInventory = false;
+                inUI = true;
+                _inPauseMenu = true;
+
+            }
+            else
+            {
+                inUI = false;
+                _inPauseMenu = false;
+            }
+        }
+    }
+
+    public bool inInventory
+    {
+        get
+        {
+            return _inInventory;
+        }
+        set
+        {
+            
+            if (value)
+            {
+                inPauseMenu = false;
+                inUI = true;
+                _inInventory = true;
+                creativeInventoryWindow.SetActive(true);
+                cursorSlot.SetActive(true);
+                
+            }
+            else
+            {
                 creativeInventoryWindow.SetActive(false);
                 cursorSlot.SetActive(false);
-                Cursor.visible = false;
+                inUI = false;
+                _inInventory = false;
             }
         }
     }
