@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -10,7 +11,7 @@ public class Chunk
 
     MeshRenderer meshRenderer;
     MeshFilter meshFilter;
-    GameObject chunkObject;
+    public GameObject chunkObject;
     World world;
 
     private bool _isActive;
@@ -32,6 +33,18 @@ public class Chunk
                                 VoxelData.ChunkWidth];
 
     public Queue<VoxelMod> modifications = new Queue<VoxelMod>();
+
+    public struct chunkUpdateThreadData
+    {
+        public Vector3 ChunkPosition;
+        public bool Valid;
+
+        public chunkUpdateThreadData(bool valid = false)
+        {
+            ChunkPosition = Vector3.zero;
+            Valid = valid;
+        }
+    }
 
     // Constructor
     public Chunk(ChunkCoord _coord, World _world, bool generateOnLoad)
@@ -62,7 +75,7 @@ public class Chunk
                                                      0f,
                                                      coord.z * VoxelData.ChunkWidth);
 
-       
+
 
         chunkObject.name = "Chunk: " + coord.x + "," + coord.z;
         PopulateVoxelMap();
@@ -70,15 +83,28 @@ public class Chunk
     }
 
     //Populates the voxels within a chunk
-    void PopulateVoxelMap()
+    void PopulateVoxelMap(bool isThreadedCall = false)
     {
+        Vector3 positionTouse = default;
+
+        if (isThreadedCall)
+        {
+            //This should only ever be called by another thread.
+            //We have to do this because we cannot get a gameobject's position from another thread.
+            MainThreadQueue.Result<Vector3> result = new MainThreadQueue.Result<Vector3>();
+            SingletonManager.MTQ.GetPositionFromGameObject(chunkObject, result);
+            positionTouse = result.Value;
+        }
+        else
+            positionTouse = position;
+
         for (int y = 0; y < VoxelData.ChunkHeight; y++)
         {
             for (int x = 0; x < VoxelData.ChunkWidth; x++)
             {
                 for (int z = 0; z < VoxelData.ChunkWidth; z++)
                 {
-                    voxelMap[x, y, z] = world.GetVoxel(new Vector3(x, y, z) + position);
+                    voxelMap[x, y, z] = world.GetVoxel(new Vector3(x, y, z) + positionTouse);
                 }
             }
         }
@@ -86,14 +112,11 @@ public class Chunk
         isVoxelMapPopulated = true;
     }
 
-    public void UpdateChunk()
+    public void UpdateChunk(Chunk.chunkUpdateThreadData threadedData = default)
     {
-        while(modifications.Count > 0)
-        {
-            VoxelMod v = modifications.Dequeue();
-            Vector3 pos = v.position -= position;
-            voxelMap[(int)pos.x, (int)pos.y, (int)pos.z] = v.id;
-        }
+        if (threadedData.Valid)
+            Monitor.Enter(this);
+        ApplyModifications(threadedData);
 
         ClearMeshData();
 
@@ -105,14 +128,31 @@ public class Chunk
                 for (int z = 0; z < VoxelData.ChunkWidth; z++)
                 {
                     if (world.blockTypes[voxelMap[x, y, z]].isSolid)
-                        UpdateMeshData(new Vector3(x, y, z));
+                        UpdateMeshData(new Vector3(x, y, z), threadedData);
                 }
             }
         }
 
-        CreateMesh();
-    }
+        CreateMesh(threadedData);
 
+        if (threadedData.Valid)
+            Monitor.Exit(this);
+    }
+    public void ApplyModifications(Chunk.chunkUpdateThreadData threadedData = default)
+    {
+        Vector3 threaded_chunkPosition = Vector3.zero;
+        if (threadedData.Valid) //This will only ever execute if isThreadedCall is TRUE
+            threaded_chunkPosition = threadedData.ChunkPosition;
+
+        while (modifications.Count > 0)
+        {
+            VoxelMod v = modifications.Dequeue();
+            Vector3 pos = v.position -= (threadedData.Valid)
+                ? threaded_chunkPosition
+                : position;
+            voxelMap[(int)pos.x, (int)pos.y, (int)pos.z] = v.id;
+        }
+    }
     // 0 is within chunk, not within worldspace
     bool IsVoxelInChunk(int x, int y, int z)
     {
@@ -141,11 +181,11 @@ public class Chunk
 
         voxelMap[xCheck, yCheck, zCheck] = newID;
 
-        
+
         // Update Surrounding Chunks
         UpdateSurroundingVoxels(xCheck, yCheck, zCheck);
 
-        UpdateChunk();
+        UpdateChunk(default);
 
     }
 
@@ -168,15 +208,19 @@ public class Chunk
                 var targetChunk = world.GetChunkFromVector3(thisVoxel + position + VoxelData.checkFaces[currentFace]);
 
                 //Chunk could be null if the position given is out of the world bounds.
-                if (targetChunk != null) 
+                if (targetChunk != null)
                     targetChunk.UpdateChunk(); //hopefully this isn't called more than once on the same chunk, otherwise we'd be wasting cpu time & resources.
             }
         }
     }
 
     // position - coordinate of the voxel
-    bool CheckVoxel(Vector3 pos)
+    bool CheckVoxel(Vector3 pos, Chunk.chunkUpdateThreadData threadedData = default)
     {
+        if (threadedData.Valid)
+        {
+
+        }
         // Always round down to int. 
         // Hardcasting, (int)position, can cause issues.
         int x = Mathf.FloorToInt(pos.x);
@@ -185,31 +229,40 @@ public class Chunk
 
         if (!IsVoxelInChunk(x, y, z))
         {
-            return world.CheckIfVoxelTransparent(pos + position);
+            if (threadedData.Valid)
+            {
+                return world.CheckIfVoxelTransparent(pos + threadedData.ChunkPosition, threadedData);
+
+            }
+            else
+                return world.CheckIfVoxelTransparent(pos + position);
+
         }
 
         return world.blockTypes[voxelMap[x, y, z]].isTransparent;
     }
 
     // use by external scripts
-    public byte GetVoxelFromGlobalVector3(Vector3 pos)
+    public byte GetVoxelFromGlobalVector3(Vector3 pos, Chunk.chunkUpdateThreadData threadedData = default)
     {
-        int xCheck = Mathf.FloorToInt(pos.x);
-        int yCheck = Mathf.FloorToInt(pos.y);
-        int zCheck = Mathf.FloorToInt(pos.z);
 
-        if (!world.IsVoxelInWorld(new Vector3(xCheck, yCheck, zCheck)))
-            return 0; //Return air
+        if (!world.IsVoxelInWorld(pos))
+            return 0; //Air
 
-        xCheck -= Mathf.FloorToInt(chunkObject.transform.position.x);
-        zCheck -= Mathf.FloorToInt(chunkObject.transform.position.z);
+        var targetChunk = world.GetChunkFromVector3(pos);
+        if (targetChunk == null)
+            return 0; //Air
 
-        return voxelMap[xCheck, yCheck, zCheck];
+        int xMod = Mathf.FloorToInt(pos.x) % VoxelData.ChunkWidth;
+        int yMod = Mathf.FloorToInt(pos.y) % VoxelData.ChunkHeight;
+        int zMod = Mathf.FloorToInt(pos.z) % VoxelData.ChunkWidth;
+        return targetChunk.voxelMap[xMod, yMod, zMod];
     }
 
     // position - coordinate of the voxel
-    void UpdateMeshData(Vector3 position)
+    void UpdateMeshData(Vector3 position, Chunk.chunkUpdateThreadData threadedData = default)
     {
+
         byte blockID = voxelMap[(int)position.x, (int)position.y, (int)position.z];
         bool isTransparent = world.blockTypes[blockID].isTransparent;
 
@@ -220,17 +273,16 @@ public class Chunk
             // Otherwise this face is exposed, draw it
 
             Vector3 nextVoxelToCheck = position + VoxelData.checkFaces[currentFace];
-            if (CheckVoxel(nextVoxelToCheck))
+            if (CheckVoxel(nextVoxelToCheck, threadedData))
             {
                 // Populate the four corners of the face of the block.
                 vertices.Add(position + VoxelData.voxelVertices[VoxelData.voxelTriangles[currentFace, 0]]);
                 vertices.Add(position + VoxelData.voxelVertices[VoxelData.voxelTriangles[currentFace, 1]]);
                 vertices.Add(position + VoxelData.voxelVertices[VoxelData.voxelTriangles[currentFace, 2]]);
                 vertices.Add(position + VoxelData.voxelVertices[VoxelData.voxelTriangles[currentFace, 3]]);
-
                 // Calculate the normals
                 // Normals determine direction of a face
-                for(int i = 0; i < 4; i++)
+                for (int i = 0; i < 4; i++)
                 {
                     normals.Add(VoxelData.checkFaces[currentFace]);
                 }
@@ -265,23 +317,35 @@ public class Chunk
         }
     }
 
-    void CreateMesh()
+    void CreateMesh(Chunk.chunkUpdateThreadData threadedData = default)
     {
-        // Build Mesh
-        Mesh mesh = new Mesh();
-        mesh.vertices = vertices.ToArray();
-        mesh.subMeshCount = 2;
-        mesh.SetTriangles(triangles.ToArray(), 0);
-        mesh.SetTriangles(transparentTriangles.ToArray(), 1);
-        mesh.uv = uvs.ToArray();
+        Action applyMeshData = new Action(() =>
+        {
+            // Build Mesh
+            Mesh mesh = new Mesh();
+            mesh.vertices = vertices.ToArray();
+            mesh.subMeshCount = 2;
+            mesh.SetTriangles(triangles.ToArray(), 0);
+            mesh.SetTriangles(transparentTriangles.ToArray(), 1);
+            mesh.uv = uvs.ToArray();
 
-        // Recalc Normals because each vertice has a direction (3 directions per vertice)
-        // This is necessary to draw cube, calculate lighting, etc
-        //mesh.RecalculateNormals();
-        mesh.normals = normals.ToArray();
+            // Recalc Normals because each vertice has a direction (3 directions per vertice)
+            // This is necessary to draw cube, calculate lighting, etc
+            //mesh.RecalculateNormals();
+            mesh.normals = normals.ToArray();
 
-        // Update the mesh filter
-        meshFilter.mesh = mesh;
+            // Update the mesh filter
+            meshFilter.mesh = mesh;
+
+        });
+
+        if (threadedData.Valid)
+        {
+            MainThreadQueue.Result result = new MainThreadQueue.Result();
+            SingletonManager.MTQ.RunAction(applyMeshData, result);
+        }
+        else
+            applyMeshData();
     }
 
     void ClearMeshData()
@@ -340,7 +404,7 @@ public class Chunk
         {
             var result = new MainThreadQueue.Result<Transform>();
             SingletonManager.MTQ.GetTransform(this.chunkObject, result);
-
+            Debug.Log("POS: " + result.Value.position.ToString());
             return result.Value.position;
         });
     }

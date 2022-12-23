@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 internal class SingletonManager
 {
-    public static GameManager GameManager;
     public static MainThreadQueue MTQ;
 }
 
