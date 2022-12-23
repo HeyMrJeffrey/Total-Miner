@@ -9,7 +9,7 @@ using System;
 
 public class World : MonoBehaviour
 {
-    public bool Multithreading = false;
+    public bool Multithreading;
 
     public Settings settings;
 
@@ -70,7 +70,7 @@ public class World : MonoBehaviour
                         //Get the chunkobject's position
                         MainThreadQueue.Result<Vector3> positionResult = new MainThreadQueue.Result<Vector3>();
                         SingletonManager.MTQ.GetPositionFromGameObject(chunksToUpdate[index].chunkObject, positionResult);
-                        updateData.ChunkPosition = positionResult.Value;
+                        updateData.ChunkPosition = positionResult.Value; //NOTE: May need to wait on IsReady?  Call Wait if so, not sure tho
 
                         updateData.Valid = true;
 
@@ -92,6 +92,7 @@ public class World : MonoBehaviour
                     }
                 }
             }
+            System.Threading.Thread.Sleep(1);
             reset.Set();
         }
     }
@@ -103,6 +104,7 @@ public class World : MonoBehaviour
 
     private void Start()
     {
+        Multithreading = true;
         // JSON EXPORT SETTINGS
         //string jsonExport = JsonUtility.ToJson(settings);
         //File.WriteAllText(Application.dataPath + "/settings.cfg", jsonExport);
