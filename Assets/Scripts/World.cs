@@ -106,7 +106,7 @@ public class World : MonoBehaviour
 
     private void Start()
     {
-        Multithreading = true;
+        Multithreading = false;
         // JSON EXPORT SETTINGS
         //string jsonExport = JsonUtility.ToJson(settings);
         //File.WriteAllText(Application.dataPath + "/settings.cfg", jsonExport);
