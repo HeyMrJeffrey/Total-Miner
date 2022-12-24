@@ -82,8 +82,6 @@ public class Player : MonoBehaviour
             {
                 NoesisView nv = GameObject.Find("Main Camera").GetComponent<NoesisView>();
 
-                
-
                 world.inPauseMenu = !world.inPauseMenu;
                 if (world.inPauseMenu)
                 {
