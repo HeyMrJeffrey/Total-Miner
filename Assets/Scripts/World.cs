@@ -6,6 +6,9 @@ using UnityEngine;
 using System.IO;
 using UnityEngine.XR;
 using System;
+using UnityEditor;
+using UnityEngine.TextCore.Text;
+using UnityEngine.U2D;
 
 public class World : MonoBehaviour
 {
@@ -38,7 +41,7 @@ public class World : MonoBehaviour
     public GameObject debugScreen;
     public GameObject creativeInventoryWindow;
     public GameObject cursorSlot;
-
+    public Dictionary<string, Sprite> blockSprites;
 
     // TESTING THREADING STUPID SHIT.
     public Thread chunkUpdateThread;
@@ -68,7 +71,7 @@ public class World : MonoBehaviour
 
                         //Get the chunkobject's position
                         MainThreadQueue.Result<Vector3> positionResult = new MainThreadQueue.Result<Vector3>();
-                        SingletonManager.MTQ.GetPositionFromGameObject(chunksToUpdate[index].chunkObject, positionResult);
+                        Globals.MTQ.GetPositionFromGameObject(chunksToUpdate[index].chunkObject, positionResult);
                         updateData.ChunkPosition = positionResult.Value;
 
                         updateData.Valid = true;
@@ -104,9 +107,59 @@ public class World : MonoBehaviour
     private bool _inInventory = false;
 
 
+
     private void Start()
     {
         Multithreading = true;
+
+        biomes = new BiomeAttributes[]
+        {
+                (BiomeAttributes)AssetDatabase.LoadAssetAtPath("Assets/Data/Biomes/Grasslands.asset", typeof(BiomeAttributes)),
+                (BiomeAttributes)AssetDatabase.LoadAssetAtPath("Assets/Data/Biomes/Desert.asset", typeof(BiomeAttributes)),
+                (BiomeAttributes)AssetDatabase.LoadAssetAtPath("Assets/Data/Biomes/Forest.asset", typeof(BiomeAttributes))
+        };
+
+        material = (Material)AssetDatabase.LoadAssetAtPath("Assets/Materials/TP_OriginalHD.mat", typeof(Material));
+        transparentMaterial = (Material)AssetDatabase.LoadAssetAtPath("Assets/Materials/TP_OriginalHD_Transparent.mat", typeof(Material));
+
+        GameObject canvas = GameObject.Find("Canvas");
+        debugScreen = canvas.transform.Find("Debug Screen").gameObject;
+        creativeInventoryWindow = canvas.transform.Find("CreativeInventory").gameObject;
+        cursorSlot = canvas.transform.Find("CursorSlot").gameObject;
+
+
+        Sprite[] sprites = Resources.LoadAll<Sprite>("Textures/TP_OriginalHD_Icons") as Sprite[];
+        blockSprites = new Dictionary<string, Sprite>(sprites.Length);
+
+        foreach (Sprite s in sprites)
+        {
+            blockSprites.Add(s.name, s);
+        }
+
+
+        blockTypes = new BlockType[]
+        {
+                new BlockType("Air", blockSprites["TP_OriginalHD_Icons_Air"], 0, true, false),
+                new BlockType("Bedrock", blockSprites["TP_OriginalHD_Icons_Bedrock"], 29),
+                new BlockType("Stone", blockSprites["TP_OriginalHD_Icons_Stone"], 17),
+                new BlockType("Grass", blockSprites["TP_OriginalHD_Icons_Grass"], 1,2,260,260,260,260),
+                new BlockType("Sand", blockSprites["TP_OriginalHD_Icons_Sand"], 3),
+                new BlockType("Dirt", blockSprites["TP_OriginalHD_Icons_Dirt"], 2),
+                new BlockType("Wood", blockSprites["TP_OriginalHD_Icons_Wood"], 261,261,5,5,5,5),
+                new BlockType("WoodPlanks", blockSprites["TP_OriginalHD_Icons_WoodPlanks"], 6),
+                new BlockType("Bricks", blockSprites["TP_OriginalHD_Icons_Bricks"], 43),
+                new BlockType("Cobblestone",blockSprites["TP_OriginalHD_Icons_Cobblestone"],  42),
+                new BlockType("Glass", blockSprites["TP_OriginalHD_Icons_Glass"], 9, true),
+                new BlockType("Leaves", blockSprites["TP_OriginalHD_Icons_Leaves"], 8, true),
+                new BlockType("Cactus", blockSprites["TP_OriginalHD_Icons_Cactus"], 151)
+        };
+
+        //create player
+        //bad spot but so many ref fix later
+        Player p = (new GameObject("Player")).AddComponent<Player>();
+        player = p.transform;
+        p.world = this;
+
         // JSON EXPORT SETTINGS
         //string jsonExport = JsonUtility.ToJson(settings);
         //File.WriteAllText(Application.dataPath + "/settings.cfg", jsonExport);
@@ -116,7 +169,7 @@ public class World : MonoBehaviour
         settings = JsonUtility.FromJson<Settings>(jsonImport);
 
         UnityEngine.Random.InitState(settings.seed);
-        SingletonManager.MTQ = new MainThreadQueue();
+        Globals.MTQ = new MainThreadQueue();
 
         spawnPosition = new Vector3(
                             (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f,
@@ -146,7 +199,11 @@ public class World : MonoBehaviour
     {
         playerChunkCoord = GetChunkCoordFromVector3(player.position);
 
-        SingletonManager.MTQ.Execute(5);
+        if (Globals.MTQ == null)//some how it can be null in unity
+            Globals.MTQ = new MainThreadQueue();
+
+
+        Globals.MTQ.Execute(5);
 
         //Only update the chunks if the player has moved from the chunk they were previously on.
         if (!playerChunkCoord.Equals(playerLastChunkCoord))
@@ -655,6 +712,34 @@ public class BlockType
     public int bottomFaceTexture;
     public int leftFaceTexture;
     public int rightFaceTexture;
+
+    public BlockType(string name, Sprite icon, int texNum, bool isTransparent = false, bool isSolid = true)
+    {
+        blockName = name;
+        this.isTransparent = isTransparent;
+        this.isSolid = isSolid;
+        backFaceTexture =
+        frontFaceTexture =
+        topFaceTexture =
+        bottomFaceTexture =
+        leftFaceTexture =
+        rightFaceTexture = texNum;
+        this.icon = icon;
+    }
+
+    public BlockType(string name, Sprite icon, int texNumTop, int texNumBottom, int texNumLeft, int texNumRight, int texNumFront, int texNumBack, bool isTransparent = false, bool isSolid = true)
+    {
+        blockName = name;
+        this.isTransparent = isTransparent;
+        this.isSolid = isSolid;
+        backFaceTexture = texNumBack;
+        frontFaceTexture = texNumFront;
+        topFaceTexture = texNumTop;
+        bottomFaceTexture = texNumBottom;
+        leftFaceTexture = texNumLeft;
+        rightFaceTexture = texNumRight;
+        this.icon = icon;
+    }
 
     // Back Front Top Bottom Left Right
     public int GetTextureID(int faceIndex)

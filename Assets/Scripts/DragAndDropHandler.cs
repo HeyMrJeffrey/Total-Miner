@@ -14,19 +14,16 @@ public class DragAndDropHandler : MonoBehaviour
 
     [SerializeField] private EventSystem m_EventSystem = null;
 
-    World world;
 
     private void Start()
     {
-        world = GameObject.Find("World").GetComponent<World>();
         cursorItemSlot = new ItemSlot(cursorSlot);
     }
 
     private void Update()
     {
         // Dont do anything unless we are actually in the UI
-        if (!world.inUI)
-            return;
+        
 
         cursorSlot.transform.position = Input.mousePosition;
 

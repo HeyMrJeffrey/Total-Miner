@@ -93,7 +93,7 @@ public class Chunk
             //This should only ever be called by another thread.
             //We have to do this because we cannot get a gameobject's position from another thread.
             MainThreadQueue.Result<Vector3> result = new MainThreadQueue.Result<Vector3>();
-            SingletonManager.MTQ.GetPositionFromGameObject(chunkObject, result);
+            Globals.MTQ.GetPositionFromGameObject(chunkObject, result);
             positionTouse = result.Value;
         }
         else
@@ -343,7 +343,7 @@ public class Chunk
         if (threadedData.Valid)
         {
             MainThreadQueue.Result result = new MainThreadQueue.Result();
-            SingletonManager.MTQ.RunAction(applyMeshData, result);
+            Globals.MTQ.RunAction(applyMeshData, result);
             result.Wait();
         }
         else
@@ -405,7 +405,7 @@ public class Chunk
         return Task.Run<Vector3>(() =>
         {
             var result = new MainThreadQueue.Result<Transform>();
-            SingletonManager.MTQ.GetTransform(this.chunkObject, result);
+            Globals.MTQ.GetTransform(this.chunkObject, result);
             Debug.Log("POS: " + result.Value.position.ToString());
             return result.Value.position;
         });

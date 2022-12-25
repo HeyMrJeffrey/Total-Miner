@@ -15,7 +15,7 @@ public class UIItemSlot : MonoBehaviour
 
     private void Awake()
     {
-        world = GameObject.Find("World").GetComponent<World>();
+        world = GameObject.Find("World")?.GetComponent<World>();
     }
 
     public bool HasItem
@@ -50,7 +50,7 @@ public class UIItemSlot : MonoBehaviour
 
     public void UpdateSlot()
     {
-        if(itemSlot != null && itemSlot.HasItem)
+        if(itemSlot != null && world != null && itemSlot.HasItem)
         {
             slotIcon.sprite = world.blockTypes[itemSlot.stack.id].icon;
             slotAmount.text = itemSlot.stack.amount.ToString();

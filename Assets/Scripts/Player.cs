@@ -10,7 +10,7 @@ public class Player : MonoBehaviour
     public bool isSprinting;
 
     public Transform cameraTransform;
-    private World world;
+    public World world;
 
     public float walkSpeed = 3f;
     public float sprintSpeed = 6f;
@@ -36,12 +36,29 @@ public class Player : MonoBehaviour
     public Toolbar toolbar;
 
 
+
     private void Start()
     {
-        cameraTransform = GameObject.Find("Main Camera").transform;
-        world = GameObject.Find("World").GetComponent<World>();
+        cameraTransform = Globals.MainCamera.transform;
+        Globals.MainCamera.transform.SetParent(transform);
+        transform.position = new Vector3(80, 100, 80);
+        walkSpeed = 3;
+        sprintSpeed = 6;
+        playerWidth = 0.25f;
+        playerHeight = 1.8f;
+        cameraTransform.localPosition = new Vector3(0, playerHeight, 0);
+        gravity = -8;
+        jumpForce = 5;
+        highlightBlock = GameObject.Find("HighlightBlock").transform;
+        placeBlock = GameObject.Find("PlaceHighlightBlock").transform;
+        checkIncrement = 0.1f;
+        reach = 8;
+        toolbar = GameObject.Find("Toolbar").GetComponent<Toolbar>();
+        
 
-        world.inUI = false;
+        //world = GameObject.Find("World").GetComponent<World>();
+
+        //world.inUI = false;
     }
 
     private void FixedUpdate()
@@ -90,6 +107,7 @@ public class Player : MonoBehaviour
                 }
                 else
                 {
+                    //nv.Content.DataContext = new TotalMinerUnityMainView();
                     //var j = new SubMenuTest();
                     //
                     //nv.Xaml.uri = "SubMenuTest";

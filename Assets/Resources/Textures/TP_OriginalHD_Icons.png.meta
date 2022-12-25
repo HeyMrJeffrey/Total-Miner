@@ -464,7 +464,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TP_OriginalHD_Icons_Limestone
+      name: TP_OriginalHD_Icons_Stone
       rect:
         serializedVersion: 2
         x: 1088
@@ -9405,6 +9405,7 @@ TextureImporter:
       TP_OriginalHD_Icons_268: 902131360
       TP_OriginalHD_Icons_425: -1079926204
       TP_OriginalHD_Icons_196: -257575140
+      TP_OriginalHD_Icons_Stone: -1872841600
       TP_OriginalHD_Icons_201: -1923236375
       TP_OriginalHD_Icons_54: -1928830413
       TP_OriginalHD_Icons_73: -2029878375
@@ -9564,7 +9565,6 @@ TextureImporter:
       TP_OriginalHD_Icons_320: 2001476739
       TP_OriginalHD_Icons_38: -445869499
       TP_OriginalHD_Icons_385: -1102918847
-      TP_OriginalHD_Icons_Limestone: -1872841600
       TP_OriginalHD_Icons_429: 1231974846
       TP_OriginalHD_Icons_269: -1025677223
       TP_OriginalHD_Icons_Water: -621802375

@@ -470,13 +470,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 233083453}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 367.5, y: 206.6, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_Father: {fileID: 546172765}
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &394166516
 PrefabInstance:
@@ -583,65 +583,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8d99e798bf279a743b3a24c2e10c0bdf, type: 3}
---- !u!1 &436504671
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 436504672}
-  - component: {fileID: 436504673}
-  m_Layer: 0
-  m_Name: Player
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &436504672
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 436504671}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 963194228}
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &436504673
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 436504671}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1443a2140679bdd4481fc26c08e87384, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isGrounded: 0
-  isSprinting: 0
-  cameraTransform: {fileID: 0}
-  walkSpeed: 3
-  sprintSpeed: 6
-  playerHeight: 1.8
-  gravity: -5
-  jumpForce: 5
-  playerWidth: 0.25
-  highlightBlock: {fileID: 1840461137}
-  placeBlock: {fileID: 862309937}
-  checkIncrement: 0.1
-  reach: 8
-  toolbar: {fileID: 549028668}
 --- !u!224 &472237184 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3122270928652725723, guid: 8d99e798bf279a743b3a24c2e10c0bdf, type: 3}
@@ -674,7 +615,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c6dad755a8724e46b398fe00b3867ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &540429437
+--- !u!1 &546172763
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -682,188 +623,43 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 540429439}
-  - component: {fileID: 540429438}
+  - component: {fileID: 546172765}
+  - component: {fileID: 546172764}
   m_Layer: 0
-  m_Name: World
+  m_Name: MainObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &540429438
+--- !u!114 &546172764
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 540429437}
+  m_GameObject: {fileID: 546172763}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ef46c1543e60bd4cbde07fafb289695, type: 3}
+  m_Script: {fileID: 11500000, guid: 47a05302e080918429d78b70d1642839, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  settings:
-    version: 0.0.1
-    viewDistance: 5
-    mouseSensitivity: 20
-    seed: 9203847
-  biomes:
-  - {fileID: 11400000, guid: 7e3476d71edc5c04c92147fd12a01301, type: 2}
-  - {fileID: 11400000, guid: adcf482cac54cd7458a93a55926256c6, type: 2}
-  - {fileID: 11400000, guid: ec4d9745a217c1048921d7950cdfaac0, type: 2}
-  player: {fileID: 436504672}
-  spawnPosition: {x: 0, y: 0, z: 0}
-  material: {fileID: 2100000, guid: 8edd078e0716ca346a60e1f294815629, type: 2}
-  transparentMaterial: {fileID: 2100000, guid: 0980e14bfe70bda47bcb8cdebb4d4dd7, type: 2}
-  blockTypes:
-  - blockName: Air
-    isSolid: 0
-    isTransparent: 1
-    icon: {fileID: 0}
-    backFaceTexture: 0
-    frontFaceTexture: 0
-    topFaceTexture: 0
-    bottomFaceTexture: 0
-    leftFaceTexture: 0
-    rightFaceTexture: 0
-  - blockName: Bedrock
-    isSolid: 1
-    isTransparent: 0
-    icon: {fileID: -2112531879, guid: 3fdfe3560afd4b146b99154775e42460, type: 3}
-    backFaceTexture: 29
-    frontFaceTexture: 29
-    topFaceTexture: 29
-    bottomFaceTexture: 29
-    leftFaceTexture: 29
-    rightFaceTexture: 29
-  - blockName: Stone
-    isSolid: 1
-    isTransparent: 0
-    icon: {fileID: -1872841600, guid: 3fdfe3560afd4b146b99154775e42460, type: 3}
-    backFaceTexture: 17
-    frontFaceTexture: 17
-    topFaceTexture: 17
-    bottomFaceTexture: 17
-    leftFaceTexture: 17
-    rightFaceTexture: 17
-  - blockName: Grass
-    isSolid: 1
-    isTransparent: 0
-    icon: {fileID: 1646328277, guid: 3fdfe3560afd4b146b99154775e42460, type: 3}
-    backFaceTexture: 260
-    frontFaceTexture: 260
-    topFaceTexture: 1
-    bottomFaceTexture: 2
-    leftFaceTexture: 260
-    rightFaceTexture: 260
-  - blockName: Sand
-    isSolid: 1
-    isTransparent: 0
-    icon: {fileID: 543637076, guid: 3fdfe3560afd4b146b99154775e42460, type: 3}
-    backFaceTexture: 3
-    frontFaceTexture: 3
-    topFaceTexture: 3
-    bottomFaceTexture: 3
-    leftFaceTexture: 3
-    rightFaceTexture: 3
-  - blockName: Dirt
-    isSolid: 1
-    isTransparent: 0
-    icon: {fileID: -1472470643, guid: 3fdfe3560afd4b146b99154775e42460, type: 3}
-    backFaceTexture: 2
-    frontFaceTexture: 2
-    topFaceTexture: 2
-    bottomFaceTexture: 2
-    leftFaceTexture: 2
-    rightFaceTexture: 2
-  - blockName: Wood
-    isSolid: 1
-    isTransparent: 0
-    icon: {fileID: 927978354, guid: 3fdfe3560afd4b146b99154775e42460, type: 3}
-    backFaceTexture: 5
-    frontFaceTexture: 5
-    topFaceTexture: 261
-    bottomFaceTexture: 5
-    leftFaceTexture: 5
-    rightFaceTexture: 5
-  - blockName: WoodPlanks
-    isSolid: 1
-    isTransparent: 0
-    icon: {fileID: 1455811669, guid: 3fdfe3560afd4b146b99154775e42460, type: 3}
-    backFaceTexture: 6
-    frontFaceTexture: 6
-    topFaceTexture: 6
-    bottomFaceTexture: 6
-    leftFaceTexture: 6
-    rightFaceTexture: 6
-  - blockName: Bricks
-    isSolid: 1
-    isTransparent: 0
-    icon: {fileID: 822892501, guid: 3fdfe3560afd4b146b99154775e42460, type: 3}
-    backFaceTexture: 43
-    frontFaceTexture: 43
-    topFaceTexture: 43
-    bottomFaceTexture: 43
-    leftFaceTexture: 43
-    rightFaceTexture: 43
-  - blockName: Cobblestone
-    isSolid: 1
-    isTransparent: 0
-    icon: {fileID: -878945229, guid: 3fdfe3560afd4b146b99154775e42460, type: 3}
-    backFaceTexture: 42
-    frontFaceTexture: 42
-    topFaceTexture: 42
-    bottomFaceTexture: 42
-    leftFaceTexture: 42
-    rightFaceTexture: 42
-  - blockName: Glass
-    isSolid: 1
-    isTransparent: 1
-    icon: {fileID: -1022202089, guid: 3fdfe3560afd4b146b99154775e42460, type: 3}
-    backFaceTexture: 9
-    frontFaceTexture: 9
-    topFaceTexture: 9
-    bottomFaceTexture: 9
-    leftFaceTexture: 9
-    rightFaceTexture: 9
-  - blockName: Leaves
-    isSolid: 1
-    isTransparent: 1
-    icon: {fileID: -974355708, guid: 3fdfe3560afd4b146b99154775e42460, type: 3}
-    backFaceTexture: 8
-    frontFaceTexture: 8
-    topFaceTexture: 8
-    bottomFaceTexture: 8
-    leftFaceTexture: 8
-    rightFaceTexture: 8
-  - blockName: Cactus
-    isSolid: 1
-    isTransparent: 0
-    icon: {fileID: -1702422870, guid: 3fdfe3560afd4b146b99154775e42460, type: 3}
-    backFaceTexture: 151
-    frontFaceTexture: 151
-    topFaceTexture: 151
-    bottomFaceTexture: 151
-    leftFaceTexture: 151
-    rightFaceTexture: 151
-  debugScreen: {fileID: 790394798}
-  creativeInventoryWindow: {fileID: 836897520}
-  cursorSlot: {fileID: 583701565}
---- !u!4 &540429439
+--- !u!4 &546172765
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 540429437}
+  m_GameObject: {fileID: 546172763}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 963194228}
+  - {fileID: 233083457}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &549028663
 GameObject:
@@ -976,7 +772,7 @@ MonoBehaviour:
   - {fileID: 560966897}
   - {fileID: 1195905377}
   - {fileID: 1235554026}
-  player: {fileID: 436504673}
+  player: {fileID: 0}
   highlight: {fileID: 908787637}
   slotIndex: 0
 --- !u!224 &560966896 stripped
@@ -995,17 +791,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c6dad755a8724e46b398fe00b3867ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &583701565 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3767516887066422110, guid: 8d99e798bf279a743b3a24c2e10c0bdf, type: 3}
-  m_PrefabInstance: {fileID: 727475454}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &583701566 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1170338088, guid: 8d99e798bf279a743b3a24c2e10c0bdf, type: 3}
   m_PrefabInstance: {fileID: 727475454}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 583701565}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c6dad755a8724e46b398fe00b3867ac, type: 3}
@@ -1437,7 +1228,7 @@ RectTransform:
   - {fileID: 836897521}
   - {fileID: 583701567}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1719,7 +1510,7 @@ Transform:
   m_Children:
   - {fileID: 210619263}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &863018062
 PrefabInstance:
@@ -1988,11 +1779,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.8, z: -0.15}
+  m_LocalPosition: {x: -367.5, y: -204.8, z: -0.15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 436504672}
+  m_Father: {fileID: 546172765}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &963194229
@@ -2002,12 +1793,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 29355477be96127469aed699dd82b4be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _xaml: {fileID: -8414808784256213763, guid: 54bd5e8236fdd214c8ddcf36418be789, type: 3}
+  _xaml: {fileID: -8414808784256213763, guid: 30a03633f265d364e8e8b2d8e264702b, type: 3}
   _texture: {fileID: 0}
   _isPPAAEnabled: 0
   _tessellationMaxPixelError: 0.2
@@ -2764,7 +2555,7 @@ Transform:
   m_Children:
   - {fileID: 174998990}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1968435543
 GameObject:
@@ -2971,7 +2762,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &7593881670338342609
 PrefabInstance:
