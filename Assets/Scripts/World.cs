@@ -51,49 +51,49 @@ public class World : MonoBehaviour
         //AutoResetEvent reset = new AutoResetEvent(false);
         while (true)
         {
-            for (int i = 0; i < chunksToAddToUpdateList.Count; i++)
+
+            lock (chunksToUpdateLock)
             {
-                var targetChunk = chunksToAddToUpdateList[0];
-                chunksToAddToUpdateList.RemoveAt(0);
-                chunksToUpdate.Add(targetChunk);
+                for (int i = 0; i < chunksToAddToUpdateList.Count; i++)
+                {
+                    var targetChunk = chunksToAddToUpdateList[0];
+                    chunksToAddToUpdateList.RemoveAt(0);
+                    chunksToUpdate.Add(targetChunk);
+                }
             }
 
             bool updated = false;
             int index = 0;
 
-            lock (chunksToUpdateLock)
+
+            while (!updated && index <= chunksToUpdate.Count - 1)
             {
-                while (!updated && index <= chunksToUpdate.Count - 1)
+                if (chunksToUpdate[index].isVoxelMapPopulated)
                 {
-                    if (chunksToUpdate[index].isVoxelMapPopulated)
+                    Chunk.chunkUpdateThreadData updateData = default;
+
+                    //Get the chunkobject's position
+                    updateData.ChunkPosition = new Vector3(chunksToUpdate[index].coord.x * VoxelData.ChunkWidth, 0, chunksToUpdate[index].coord.z * VoxelData.ChunkWidth);
+                    updateData.Valid = true;
+
+                    try
                     {
-                        Chunk.chunkUpdateThreadData updateData = default;
+                        chunksToUpdate[index].UpdateChunk(updateData);
 
-                        //Get the chunkobject's position
-                        MainThreadQueue.Result<Vector3> positionResult = new MainThreadQueue.Result<Vector3>();
-                        Globals.MTQ.GetPositionFromGameObject(chunksToUpdate[index].chunkObject, positionResult);
-                        updateData.ChunkPosition = positionResult.Value;
-
-                        updateData.Valid = true;
-
-                        try
-                        {
-                            chunksToUpdate[index].UpdateChunk(updateData);
-
-                        }
-                        catch (Exception ex)
-                        {
-
-                        }
-                        chunksToUpdate.RemoveAt(index);
-                        updated = true;
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        index++;
+
                     }
+                    chunksToUpdate.RemoveAt(index);
+                    updated = true;
+                }
+                else
+                {
+                    index++;
                 }
             }
+
             System.Threading.Thread.Sleep(1);
             // reset.Set();
         }
@@ -686,14 +686,17 @@ public class World : MonoBehaviour
     {
         bool value = false;
 
-        if (chunksToUpdate.Contains(chunk) || chunksToAddToUpdateList.Contains(chunk))
-            value = false;
-        else
+        lock (chunksToUpdateLock)
         {
-            chunksToAddToUpdateList.Add(chunk);
-            value = true;
+            if (chunksToAddToUpdateList.Contains(chunk))
+                value = false;
+            else
+            {
+                chunksToAddToUpdateList.Add(chunk);
+                value = true;
+            }
+            return value;
         }
-        return value;
     }
 }
 
