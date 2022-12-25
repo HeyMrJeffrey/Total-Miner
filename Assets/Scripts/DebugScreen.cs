@@ -31,6 +31,7 @@ public class DebugScreen : MonoBehaviour
         StringBuilder tBuilt = new StringBuilder();
         tBuilt.AppendLine("DEBUG INFO");
         tBuilt.AppendLine($"FPS: {frameRate}");
+        tBuilt.AppendLine($"THREAD UPDATING {(world.chunksToUpdate.Count)} CHUNKS");
         tBuilt.AppendLine($"XYZ: {world.player.transform.position.ToString()}");
 
         tBuilt.Append("CHUNK: ");

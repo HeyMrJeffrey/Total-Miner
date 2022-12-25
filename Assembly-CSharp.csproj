@@ -58,23 +58,27 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\2022.2.1f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\NoesisGUI\MainWindow.xaml.cs" />
     <Compile Include="Assets\Scripts\World.cs" />
+    <Compile Include="Assets\NoesisGUI\MainMenu.xaml.cs" />
     <Compile Include="Assets\Scripts\BiomeAttributes.cs" />
     <Compile Include="Assets\Scripts\ItemStack.cs" />
+    <Compile Include="Assets\Scripts\Globals.cs" />
     <Compile Include="Assets\Scripts\Structure.cs" />
     <Compile Include="Assets\Scripts\Noise.cs" />
     <Compile Include="Assets\Scripts\CreativeInventory.cs" />
+    <Compile Include="Assets\Scripts\Main.cs" />
     <Compile Include="Assets\Scripts\Chunk.cs" />
     <Compile Include="Assets\Scripts\DragAndDropHandler.cs" />
     <Compile Include="Assets\Scripts\VoxelData.cs" />
     <Compile Include="Assets\NoesisGUI\SubMenuTest.xaml.cs" />
     <Compile Include="Assets\Scripts\Player.cs" />
+    <Compile Include="Assets\NoesisGUI\ViewModel.cs" />
     <Compile Include="Assets\Scripts\Threading\fuckThreading.cs" />
+    <Compile Include="Assets\NoesisGUI\DelegateCommand.cs" />
     <Compile Include="Assets\Scripts\DebugScreen.cs" />
     <Compile Include="Assets\Scripts\Toolbar.cs" />
     <Compile Include="Assets\Scripts\UIItemSlot.cs" />
-    <Compile Include="Assets\Scripts\SingletonManager.cs" />
-    <Compile Include="Assets\NoesisGUI\TotalMinerUnityMainView.xaml.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

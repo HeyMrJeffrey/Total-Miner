@@ -29,7 +29,7 @@ public class World : MonoBehaviour
     public List<ChunkCoord> activeChunks = new List<ChunkCoord>();
     public List<ChunkCoord> chunksToCreate = new List<ChunkCoord>();
 
-    List<Chunk> chunksToUpdate = new List<Chunk>();
+    public List<Chunk> chunksToUpdate = new List<Chunk>();
     List<Chunk> chunksToAddToUpdateList = new List<Chunk>();
     object chunksToUpdateLock = new object();
 
@@ -62,38 +62,24 @@ public class World : MonoBehaviour
                 }
             }
 
-            bool updated = false;
-            int index = 0;
+            int maxToUpdate = 3;
+            int numToUpdate = Math.Min(maxToUpdate, chunksToUpdate.Count);
 
-
-            while (!updated && index <= chunksToUpdate.Count - 1)
+            for (int i = 0; i < numToUpdate; i++)
             {
-                if (chunksToUpdate[index].isVoxelMapPopulated)
-                {
-                    Chunk.chunkUpdateThreadData updateData = default;
+                var targetChunk = chunksToUpdate[0];
 
-                    //Get the chunkobject's position
-                    updateData.ChunkPosition = new Vector3(chunksToUpdate[index].coord.x * VoxelData.ChunkWidth, 0, chunksToUpdate[index].coord.z * VoxelData.ChunkWidth);
-                    updateData.Valid = true;
+                Chunk.chunkUpdateThreadData updateData = default;
+                updateData.ChunkPosition = new Vector3(targetChunk.coord.x * VoxelData.ChunkWidth, 0, targetChunk.coord.z * VoxelData.ChunkWidth);
+                updateData.Valid = true;
 
-                    try
-                    {
-                        chunksToUpdate[index].UpdateChunk(updateData);
+                if (!targetChunk.isVoxelMapPopulated)
+                    targetChunk.PopulateVoxelMap();
 
-                    }
-                    catch (Exception ex)
-                    {
+                chunksToUpdate[0].UpdateChunk(updateData);
 
-                    }
-                    chunksToUpdate.RemoveAt(index);
-                    updated = true;
-                }
-                else
-                {
-                    index++;
-                }
+                chunksToUpdate.RemoveAt(0);
             }
-
             System.Threading.Thread.Sleep(1);
             // reset.Set();
         }
@@ -267,8 +253,9 @@ public class World : MonoBehaviour
 
                 // Enqueueing into the chunk modifications, not the world modifications
                 chunkMap[coord.x, coord.z].modifications.Enqueue(v);
+                if (!chunksToUpdate.Contains(chunkMap[coord.x, coord.z]))
+                    chunksToUpdate.Add(chunkMap[coord.x, coord.z]);
 
-                AddChunkToUpdateList(chunkMap[coord.x, coord.z]);
             }
         }
 
@@ -291,7 +278,8 @@ public class World : MonoBehaviour
             ChunkCoord coord = chunksToCreate[0];
             chunksToCreate.RemoveAt(0);
             activeChunks.Add(coord);
-            chunkMap[coord.x, coord.z].Init();
+            chunkMap[coord.x, coord.z].Init(false, false); //We're not going to populate or update it here.  That will be handled in the multithreading code.
+            AddChunkToUpdateList(chunkMap[coord.x, coord.z]);
         }
     }
 

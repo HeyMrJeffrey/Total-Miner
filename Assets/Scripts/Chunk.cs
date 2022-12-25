@@ -54,10 +54,10 @@ public class Chunk
         _isActive = true;
 
         if (generateOnLoad)
-            Init();
+            Init(true, true);
     }
 
-    public void Init()
+    public void Init(bool populate = true, bool update = true)
     {
         chunkObject = new GameObject();
         isActive = false;
@@ -75,37 +75,25 @@ public class Chunk
                                                      0f,
                                                      coord.z * VoxelData.ChunkWidth);
 
-
-
         chunkObject.name = "Chunk: " + coord.x + "," + coord.z;
-        PopulateVoxelMap();
-        //UpdateChunk();
-        world.AddChunkToUpdateList(this);
+
+        if (populate)
+            PopulateVoxelMap();
+        if (update)
+            UpdateChunk();
     }
 
     //Populates the voxels within a chunk
-    void PopulateVoxelMap(bool isThreadedCall = false)
+    public void PopulateVoxelMap(bool isThreadedCall = false)
     {
-        Vector3 positionTouse = default;
-
-        if (isThreadedCall)
-        {
-            //This should only ever be called by another thread.
-            //We have to do this because we cannot get a gameobject's position from another thread.
-            MainThreadQueue.Result<Vector3> result = new MainThreadQueue.Result<Vector3>();
-            Globals.MTQ.GetPositionFromGameObject(chunkObject, result);
-            positionTouse = result.Value;
-        }
-        else
-            positionTouse = position;
-
+        var positionToUse = new Vector3(coord.x * VoxelData.ChunkWidth, 0, coord.z * VoxelData.ChunkWidth);
         for (int y = 0; y < VoxelData.ChunkHeight; y++)
         {
             for (int x = 0; x < VoxelData.ChunkWidth; x++)
             {
                 for (int z = 0; z < VoxelData.ChunkWidth; z++)
                 {
-                    voxelMap[x, y, z] = world.GetVoxel(new Vector3(x, y, z) + positionTouse);
+                    voxelMap[x, y, z] = world.GetVoxel(new Vector3(x, y, z) + positionToUse);
                 }
             }
         }
