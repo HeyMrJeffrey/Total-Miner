@@ -13,7 +13,7 @@ using UnityEngine.Assertions;
 
 public class World : MonoBehaviour
 {
-    public bool Multithreading;
+    public bool Multithreading = true;
 
     public Settings settings;
 
@@ -131,8 +131,7 @@ public class World : MonoBehaviour
     private bool _inInventory = false;
 
 
-
-    private void Start()
+    public void Init()
     {
         Multithreading = true;
 
@@ -178,38 +177,36 @@ public class World : MonoBehaviour
                 new BlockType("Cactus", blockSprites["TP_OriginalHD_Icons_Cactus"], 151)
         };
 
+        spawnPosition = 
+            new Vector3((VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f,
+                         VoxelData.ChunkHeight - 40,
+                        (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f);
+
         //create player
         //bad spot but so many ref fix later
         Player p = (new GameObject("Player")).AddComponent<Player>();
+        p.Init(this);
         player = p.transform;
-        p.world = this;
 
+    }
+
+    private void Start()
+    {
         // JSON EXPORT SETTINGS
         //string jsonExport = JsonUtility.ToJson(settings);
         //File.WriteAllText(Application.dataPath + "/settings.cfg", jsonExport);
 
         // JSON IMPORT SETTINGS
+        //move to main and put setting in own static class
         string jsonImport = File.ReadAllText(Application.dataPath + "/settings.cfg");
         settings = JsonUtility.FromJson<Settings>(jsonImport);
 
         UnityEngine.Random.InitState(settings.seed);
-        Globals.MTQ = new MainThreadQueue();
-
-        spawnPosition = new Vector3(
-                            (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f,
-                            VoxelData.ChunkHeight - 40,
-                            (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f
-                            );
-
-
+        
         GenerateWorld();
-
-
 
         playerLastChunkCoord = playerChunkCoord = GetChunkCoordFromVector3(player.position);
         CheckViewDistance(); //temporary, just spawn immediate chunks instead, this is very hacky way of getting the initial chunks to load when the game starts
-
-
 
         // TESTING THREADING SHIT
         if (Multithreading)

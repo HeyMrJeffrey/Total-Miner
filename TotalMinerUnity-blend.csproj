@@ -37,6 +37,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Noesis.GUI.Extensions">
+      <HintPath>Blend\bin\Debug\Noesis.GUI.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -56,16 +59,32 @@
     <ApplicationDefinition Include="Blend\App.xaml">
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
+    <Compile Include="Assets\NoesisGUI\DelegateCommand.cs" />
+    <Compile Include="Assets\NoesisGUI\MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Assets\NoesisGUI\SubMenuTest.xaml.cs">
+      <DependentUpon>SubMenuTest.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Assets\NoesisGUI\ViewModel.cs" />
     <Compile Include="Blend\App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Assets\NoesisGUI\TotalMinerUnityMainView.xaml">
+    <Page Include="Assets\NoesisGUI\MainWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Assets\NoesisGUI\SubMenuTest.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="Assets\NoesisGUI\TotalMinerUnityMainView.xaml.cs">
-      <DependentUpon>TotalMinerUnityMainView.xaml</DependentUpon>
+    <Page Include="Assets\NoesisGUI\MainMenu.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="Assets\NoesisGUI\MainMenu.xaml.cs">
+      <DependentUpon>MainMenu.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

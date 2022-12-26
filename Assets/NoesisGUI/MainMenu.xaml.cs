@@ -18,12 +18,8 @@ namespace TotalMinerUnity
     public partial class MainMenu : UserControl
     {
 
-        
-
         public MainMenu()
         {
-            
-
             InitializeComponent();
         }
 
@@ -34,9 +30,5 @@ namespace TotalMinerUnity
         }
 #endif
 
-
-
-
-        
     }
 }
