@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
 using TotalMinerUnity;
+using TotalMinerUnity.Menus;
 using UnityEngine;
 
 public class Main : MonoBehaviour

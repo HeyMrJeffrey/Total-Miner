@@ -10,7 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 #endif
 
-namespace TotalMinerUnity
+namespace TotalMinerUnity.Menus
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -21,7 +21,6 @@ namespace TotalMinerUnity
         {
             this.Loaded += OnLoaded;
             this.SizeChanged += OnSizeChanged;
-
             this.InitializeComponent();
         }
 

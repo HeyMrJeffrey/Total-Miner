@@ -10,7 +10,7 @@ using System;
 using System.Windows.Controls;
 #endif
 
-namespace TotalMinerUnity
+namespace TotalMinerUnity.Menus
 {
     /// <summary>
     /// Interaction logic for MainMenu.xaml
