@@ -9,6 +9,7 @@ using System;
 using UnityEditor;
 using UnityEngine.TextCore.Text;
 using UnityEngine.U2D;
+using UnityEngine.Assertions;
 
 public class World : MonoBehaviour
 {
@@ -29,11 +30,10 @@ public class World : MonoBehaviour
     public List<ChunkCoord> activeChunks = new List<ChunkCoord>();
     public List<ChunkCoord> chunksToCreate = new List<ChunkCoord>();
 
-    List<Chunk> chunksToUpdate = new List<Chunk>();
+    public List<Chunk> chunksToUpdate = new List<Chunk>();
     List<Chunk> chunksToAddToUpdateList = new List<Chunk>();
     object chunksToUpdateLock = new object();
 
-    private bool applyingModifications = false;
 
     public ChunkCoord playerChunkCoord;
     ChunkCoord playerLastChunkCoord;
@@ -54,6 +54,43 @@ public class World : MonoBehaviour
 
             lock (chunksToUpdateLock)
             {
+                /* APPLYING MODIFICATIONS TO EACH CHUNK'S QUEUE */
+
+                //If a chunk has not yet been created then we will throw it into the chunksToCreate, otherwise we will go ahead and apply it's modifications.
+                //It will then loop back around through here at some point after it's been created because we re-queue it's modifications
+                //int numModsToAttempt = modifications.Count;
+                //for (int i = 0; i < numModsToAttempt; i++)
+                //{
+                //    //We don't want to dequeue the 
+                //    VoxelMod mod = modifications.Dequeue();
+                //    ChunkCoord coord = GetChunkCoordFromVector3(mod.position);
+                //    if (coord.x >= 0 && coord.x < VoxelData.WorldSizeInChunks && coord.z >= 0 && coord.z < VoxelData.WorldSizeInChunks)
+                //    {
+                //        //The voxel mod is in the world bounds.
+                //        //We will now check to see if the chunk associated with this voxelmod has been created.
+                //        Chunk targetChunk = null;
+                //        if ((targetChunk = chunkMap[coord.x, coord.z]) == null)
+                //        {
+                //            //The chunk hasn't been created, let's add it to the chunksToCreateList.
+                //            chunksToCreate.Add(coord);
+                //            modifications.Enqueue(mod);
+                //            continue;
+                //        }
+                //        else
+                //        {
+                //            //The chunk exists, let's queue it's voxelmod.
+                //            targetChunk.modifications.Enqueue(mod);
+                //            if (!chunksToAddToUpdateList.Contains(targetChunk))
+                //                chunksToAddToUpdateList.Add(targetChunk); //We don't use `AddChunkToUpdateList` because that acquires a lock and we already have one.
+                //        }
+                //    }
+                //    else
+                //    {
+                //        //Voxel mod out of world bounds.  Drop it.
+                //    }
+                //}
+
+
                 for (int i = 0; i < chunksToAddToUpdateList.Count; i++)
                 {
                     var targetChunk = chunksToAddToUpdateList[0];
@@ -62,44 +99,31 @@ public class World : MonoBehaviour
                 }
             }
 
-            bool updated = false;
-            int index = 0;
+            /* UPDATING THE CHUNKS */
 
-
-            while (!updated && index <= chunksToUpdate.Count - 1)
+            int maxToUpdate = 10;
+            int numToUpdate = Math.Min(maxToUpdate, chunksToUpdate.Count);
+            for (int i = 0; i < numToUpdate; i++)
             {
-                if (chunksToUpdate[index].isVoxelMapPopulated)
-                {
-                    Chunk.chunkUpdateThreadData updateData = default;
+                var targetChunk = chunksToUpdate[0];
 
-                    //Get the chunkobject's position
-                    updateData.ChunkPosition = new Vector3(chunksToUpdate[index].coord.x * VoxelData.ChunkWidth, 0, chunksToUpdate[index].coord.z * VoxelData.ChunkWidth);
-                    updateData.Valid = true;
+                Chunk.chunkUpdateThreadData updateData = default;
+                updateData.ChunkPosition = new Vector3(targetChunk.coord.x * VoxelData.ChunkWidth, 0, targetChunk.coord.z * VoxelData.ChunkWidth);
+                updateData.Valid = true;
 
-                    try
-                    {
-                        chunksToUpdate[index].UpdateChunk(updateData);
+                if (!targetChunk.IsGenerated)
+                    targetChunk.PopulateVoxelMap();
 
-                    }
-                    catch (Exception ex)
-                    {
+                chunksToUpdate[0].UpdateChunk(updateData);
 
-                    }
-                    chunksToUpdate.RemoveAt(index);
-                    updated = true;
-                }
-                else
-                {
-                    index++;
-                }
+                chunksToUpdate.RemoveAt(0);
             }
-
             System.Threading.Thread.Sleep(1);
             // reset.Set();
         }
     }
     // Modifications to a chunk (trees overlapping chunks)
-    Queue<VoxelMod> modifications = new Queue<VoxelMod>();
+    volatile Queue<VoxelMod> modifications = new Queue<VoxelMod>();
 
     // UI - Inventory
     private bool _inUI = false;
@@ -208,11 +232,6 @@ public class World : MonoBehaviour
             CheckViewDistance();
         }
 
-        if (modifications.Count > 0 && !applyingModifications)
-        {
-            //StartCoroutine(ApplyModifications());
-        }
-
         if (chunksToCreate.Count > 0)
         {
             CreateChunk();
@@ -258,14 +277,15 @@ public class World : MonoBehaviour
                 // gen that chunk
                 if (chunkMap[coord.x, coord.z] == null)
                 {
-                    chunkMap[coord.x, coord.z] = new Chunk(coord, this, true);
-                    activeChunks.Add(coord);
+                    chunkMap[coord.x, coord.z] = new Chunk(coord, this, false);
+                    chunkMap[coord.x, coord.z].Init(true, false);
                 }
 
                 // Enqueueing into the chunk modifications, not the world modifications
                 chunkMap[coord.x, coord.z].modifications.Enqueue(v);
+                if (!chunksToUpdate.Contains(chunkMap[coord.x, coord.z]))
+                    chunksToUpdate.Add(chunkMap[coord.x, coord.z]);
 
-                AddChunkToUpdateList(chunkMap[coord.x, coord.z]);
             }
         }
 
@@ -287,107 +307,46 @@ public class World : MonoBehaviour
         {
             ChunkCoord coord = chunksToCreate[0];
             chunksToCreate.RemoveAt(0);
-            activeChunks.Add(coord);
-            chunkMap[coord.x, coord.z].Init();
+            if (chunkMap[coord.x, coord.z] == null)
+                chunkMap[coord.x, coord.z] = new Chunk(coord, this, false);
+            if (!chunkMap[coord.x, coord.z].IsInitialized && !chunkMap[coord.x, coord.z].IsInitializing)
+                chunkMap[coord.x, coord.z].Init(false, false); //We're not going to populate or update it here.  That will be handled in the multithreading code.
+            AddChunkToUpdateList(chunkMap[coord.x, coord.z]);
         }
     }
 
     void UpdateChunks()
     {
-        if (Multithreading)
-            return;
+        Assert.IsTrue(!Multithreading, "UpdateChunks cannot be called if multithreading is active.");
 
         bool updated = false;
-
         int index = 0;
-
-
-
         while (!updated && index < chunksToUpdate.Count - 1)
-
         {
-
-            if (chunksToUpdate[index].isVoxelMapPopulated)
-
+            if (chunksToUpdate[index].IsGenerated)
             {
-
                 chunksToUpdate[index].UpdateChunk();
-
                 chunksToUpdate.RemoveAt(index);
-
                 updated = true;
-
             }
-
             else
-
             {
-
                 index++;
-
             }
         }
     }
 
-    IEnumerator ApplyModifications()
-    {
-        applyingModifications = true;
-        int count = 0;
 
-        while (modifications.Count > 0)
+    bool IsTargetVisible(Camera c, GameObject go)
+    {
+        var planes = GeometryUtility.CalculateFrustumPlanes(c);
+        var point = go.transform.position;
+        foreach (var plane in planes)
         {
-            VoxelMod v = modifications.Dequeue();
-            ChunkCoord coord = GetChunkCoordFromVector3(v.position);
-
-            if (coord.x >= 0 && coord.x < VoxelData.WorldSizeInChunks && coord.z >= 0 && coord.z < VoxelData.WorldSizeInChunks)
-            {
-
-                // If a modification is occuring on a chunk that isnt genned, but on the border of one that is
-                // i.e. a tree on a genned chunk that has leaves on a non genned chunk
-                // gen that chunk
-                if (chunkMap[coord.x, coord.z] == null)
-                {
-                    chunkMap[coord.x, coord.z] = new Chunk(coord, this, true);
-                    activeChunks.Add(coord);
-                }
-
-                // Enqueueing into the chunk modifications, not the world modifications
-                chunkMap[coord.x, coord.z].modifications.Enqueue(v);
-
-                AddChunkToUpdateList(chunkMap[coord.x, coord.z]);
-
-                count++;
-                // Only 200 voxel modifications per frame
-                if (count > 200)
-                {
-                    count = 0;
-                    yield return null;
-                }
-            }
+            if (plane.GetDistanceToPoint(point) < 0)
+                return false;
         }
-
-        applyingModifications = false;
-    }
-
-
-    ChunkCoord GetChunkCoordFromVector3(Vector3 pos)
-    {
-        int x = Mathf.FloorToInt(pos.x / VoxelData.ChunkWidth);
-        int z = Mathf.FloorToInt(pos.z / VoxelData.ChunkWidth);
-
-        return new ChunkCoord(x, z);
-    }
-
-    public Chunk GetChunkFromVector3(Vector3 pos)
-    {
-        int x = Mathf.FloorToInt(pos.x / VoxelData.ChunkWidth);
-        int z = Mathf.FloorToInt(pos.z / VoxelData.ChunkWidth);
-
-        //If the position given is out of the world bounds, then there is no chunk there.
-        if (!IsVoxelInWorld(pos))
-            return null;
-
-        return chunkMap[x, z];
+        return true;
     }
 
     void CheckViewDistance()
@@ -408,13 +367,15 @@ public class World : MonoBehaviour
                     if (chunkMap[x, z] == null)
                     {
                         chunkMap[x, z] = new Chunk(thisChunkCoord, this, false);
+                        chunkMap[x, z].Init(false, false);
+                        chunkMap[x, z].isActive = true;
                         chunksToCreate.Add(thisChunkCoord);
                     }
-                    else if (!(chunkMap[x, z].isActive))
+                    else
                     {
                         chunkMap[x, z].isActive = true;
+                        chunkMap[x, z].SetChunkActive(true);
                     }
-                    activeChunks.Add(thisChunkCoord);
                 }
 
                 for (int i = 0; i < previouslyActiveChunks.Count; i++)
@@ -442,7 +403,7 @@ public class World : MonoBehaviour
         if (!IsChunkInWorld(thisChunk) || pos.y < 0 || pos.y > VoxelData.ChunkHeight)
             return false;
 
-        if (chunkMap[thisChunk.x, thisChunk.z] != null && chunkMap[thisChunk.x, thisChunk.z].isVoxelMapPopulated)
+        if (chunkMap[thisChunk.x, thisChunk.z] != null && chunkMap[thisChunk.x, thisChunk.z].IsGenerated)
         {
             return blockTypes[chunkMap[thisChunk.x, thisChunk.z].GetVoxelFromGlobalVector3(pos)].isSolid;
         }
@@ -450,20 +411,6 @@ public class World : MonoBehaviour
         return blockTypes[GetVoxel(pos)].isSolid;
     }
 
-    public bool CheckIfVoxelTransparent(Vector3 pos, Chunk.chunkUpdateThreadData threadedData = default)
-    {
-        ChunkCoord thisChunk = new ChunkCoord(pos);
-
-        if (!IsChunkInWorld(thisChunk) || pos.y < 0 || pos.y > VoxelData.ChunkHeight)
-            return false;
-
-        if (chunkMap[thisChunk.x, thisChunk.z] != null && chunkMap[thisChunk.x, thisChunk.z].isVoxelMapPopulated)
-        {
-            return blockTypes[chunkMap[thisChunk.x, thisChunk.z].GetVoxelFromGlobalVector3(pos, threadedData)].isTransparent;
-        }
-
-        return blockTypes[GetVoxel(pos)].isTransparent;
-    }
 
     public bool inUI
     {
@@ -665,6 +612,39 @@ public class World : MonoBehaviour
         else
             return false;
     }
+    public bool CheckIfVoxelTransparent(Vector3 pos, Chunk.chunkUpdateThreadData threadedData = default)
+    {
+        ChunkCoord thisChunk = new ChunkCoord(pos);
+
+        if (!IsChunkInWorld(thisChunk) || pos.y < 0 || pos.y > VoxelData.ChunkHeight)
+            return false;
+
+        if (chunkMap[thisChunk.x, thisChunk.z] != null && chunkMap[thisChunk.x, thisChunk.z].IsGenerated)
+        {
+            return blockTypes[chunkMap[thisChunk.x, thisChunk.z].GetVoxelFromGlobalVector3(pos, threadedData)].isTransparent;
+        }
+
+        return blockTypes[GetVoxel(pos)].isTransparent;
+    }
+
+    ChunkCoord GetChunkCoordFromVector3(Vector3 pos)
+    {
+        int x = Mathf.FloorToInt(pos.x / VoxelData.ChunkWidth);
+        int z = Mathf.FloorToInt(pos.z / VoxelData.ChunkWidth);
+
+        return new ChunkCoord(x, z);
+    }
+    public Chunk GetChunkFromVector3(Vector3 pos)
+    {
+        int x = Mathf.FloorToInt(pos.x / VoxelData.ChunkWidth);
+        int z = Mathf.FloorToInt(pos.z / VoxelData.ChunkWidth);
+
+        //If the position given is out of the world bounds, then there is no chunk there.
+        if (!IsVoxelInWorld(pos))
+            return null;
+
+        return chunkMap[x, z];
+    }
 
     bool IsChunkInWorld(ChunkCoord coord)
     {
@@ -692,8 +672,24 @@ public class World : MonoBehaviour
                 chunksToAddToUpdateList.Add(chunk);
                 value = true;
             }
-            return value;
         }
+        return value;
+    }
+    public int AddChunksToUpdateList(IEnumerable<Chunk> chunks)
+    {
+        int toRet = 0;
+        lock (chunksToUpdateLock)
+        {
+            foreach (var chunk in chunks)
+            {
+                if (!chunksToAddToUpdateList.Contains(chunk))
+                {
+                    chunksToAddToUpdateList.Add(chunk);
+                    toRet++;
+                }
+            }
+        }
+        return toRet;
     }
 }
 

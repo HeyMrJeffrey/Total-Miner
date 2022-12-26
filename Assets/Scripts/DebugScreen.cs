@@ -31,6 +31,7 @@ public class DebugScreen : MonoBehaviour
         StringBuilder tBuilt = new StringBuilder();
         tBuilt.AppendLine("DEBUG INFO");
         tBuilt.AppendLine($"FPS: {frameRate}");
+        tBuilt.AppendLine($"THREAD UPDATING {(world.chunksToUpdate.Count)} CHUNKS");
         tBuilt.AppendLine($"XYZ: {world.player.transform.position.ToString()}");
 
         tBuilt.Append("CHUNK: ");
@@ -312,7 +313,7 @@ public class DebugScreen : MonoBehaviour
             return 0; //Air
 
         var targetChunk = world.GetChunkFromVector3(pos);
-        if (targetChunk != null)
+        if (targetChunk != null && targetChunk.chunkObject != null)
         {
             var blockPosInChunk = pos - targetChunk.position;
 

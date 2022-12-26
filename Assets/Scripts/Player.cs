@@ -46,7 +46,7 @@ public class Player : MonoBehaviour
     {
         cameraTransform = Globals.MainCamera.transform;
         Globals.MainCamera.transform.SetParent(transform);
-        transform.position = new Vector3(80, 100, 80);
+        //transform.position = new Vector3(80, 100, 80);
         cameraTransform.localPosition = new Vector3(0, playerHeight, 0);
         highlightBlock = GameObject.Find("HighlightBlock").transform;
         placeBlock = GameObject.Find("PlaceHighlightBlock").transform;
