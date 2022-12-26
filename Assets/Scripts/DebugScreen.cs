@@ -313,7 +313,7 @@ public class DebugScreen : MonoBehaviour
             return 0; //Air
 
         var targetChunk = world.GetChunkFromVector3(pos);
-        if (targetChunk != null)
+        if (targetChunk != null && targetChunk.chunkObject != null)
         {
             var blockPosInChunk = pos - targetChunk.position;
 

@@ -41,7 +41,7 @@ public class Player : MonoBehaviour
     {
         cameraTransform = Globals.MainCamera.transform;
         Globals.MainCamera.transform.SetParent(transform);
-        transform.position = new Vector3(80, 100, 80);
+        //transform.position = new Vector3(80, 100, 80);
         walkSpeed = 3;
         sprintSpeed = 6;
         playerWidth = 0.25f;

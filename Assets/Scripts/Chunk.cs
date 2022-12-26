@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class Chunk
 {
@@ -14,9 +15,50 @@ public class Chunk
     public GameObject chunkObject;
     World world;
 
-    private bool _isActive;
 
-    public bool isVoxelMapPopulated = false;
+    [Flags]
+    public enum eChunkFlags
+    {
+        CREATING,
+        CREATED,
+        INITIALIZING,
+        INITIALIZED,
+        GENERATING,
+        GENERATED,
+        DECORATING,
+        DECORATED
+    }
+
+    public eChunkFlags ChunkFlags;
+
+    public void SetChunkFlag(eChunkFlags flag)
+    {
+        ChunkFlags |= flag;
+    }
+    public void ClearChunkFlag(eChunkFlags flag)
+    {
+        ChunkFlags &= ~flag;
+    }
+    public bool IsChunkFlagSet(eChunkFlags flag)
+    {
+        return (ChunkFlags & flag) == flag;
+    }
+
+    public bool IsCreating => IsChunkFlagSet(eChunkFlags.CREATING);
+    public bool IsCreated => IsChunkFlagSet(eChunkFlags.CREATED);
+    public bool IsInitializing => IsChunkFlagSet(eChunkFlags.INITIALIZING);
+    public bool IsInitialized => IsChunkFlagSet(eChunkFlags.INITIALIZED);
+    public bool IsGenerating => IsChunkFlagSet(eChunkFlags.GENERATING);
+    public bool IsGenerated => IsChunkFlagSet(eChunkFlags.GENERATED);
+    public bool IsDecorating => IsChunkFlagSet(eChunkFlags.DECORATING);
+    public bool IsDecorated => IsChunkFlagSet(eChunkFlags.DECORATED);
+
+
+    public void SetChunkActive(bool active)
+    {
+        Assert.IsTrue(chunkObject != null, $"SetChunkActive on NULL_CHUNK_GO_{coord.ToString()}");
+        isActive = active;
+    }
 
     int vertexIndex = 0;
     // List is not he efficient way of doing this, but it is the easiest
@@ -49,9 +91,13 @@ public class Chunk
     // Constructor
     public Chunk(ChunkCoord _coord, World _world, bool generateOnLoad)
     {
+        SetChunkFlag(eChunkFlags.CREATING);
+
         coord = _coord;
         world = _world;
-        _isActive = true;
+
+        SetChunkFlag(eChunkFlags.CREATED);
+        ClearChunkFlag(eChunkFlags.CREATING);
 
         if (generateOnLoad)
             Init(true, true);
@@ -59,8 +105,9 @@ public class Chunk
 
     public void Init(bool populate = true, bool update = true)
     {
+        SetChunkFlag(eChunkFlags.INITIALIZING);
         chunkObject = new GameObject();
-        isActive = false;
+        SetChunkActive(_isActive);
 
         meshFilter = chunkObject.AddComponent<MeshFilter>();
         meshRenderer = chunkObject.AddComponent<MeshRenderer>();
@@ -77,15 +124,22 @@ public class Chunk
 
         chunkObject.name = "Chunk: " + coord.x + "," + coord.z;
 
+        ClearChunkFlag(eChunkFlags.INITIALIZING);
+        SetChunkFlag(eChunkFlags.INITIALIZED);
+
         if (populate)
             PopulateVoxelMap();
         if (update)
             UpdateChunk();
     }
 
+
+
     //Populates the voxels within a chunk
     public void PopulateVoxelMap(bool isThreadedCall = false)
     {
+        SetChunkFlag(eChunkFlags.GENERATING);
+
         var positionToUse = new Vector3(coord.x * VoxelData.ChunkWidth, 0, coord.z * VoxelData.ChunkWidth);
         for (int y = 0; y < VoxelData.ChunkHeight; y++)
         {
@@ -97,12 +151,14 @@ public class Chunk
                 }
             }
         }
+        ClearChunkFlag(eChunkFlags.GENERATING);
+        SetChunkFlag(eChunkFlags.GENERATED);
 
-        isVoxelMapPopulated = true;
     }
 
     public void UpdateChunk(Chunk.chunkUpdateThreadData threadedData = default)
     {
+
         if (threadedData.Valid)
             Monitor.Enter(this);
         ApplyModifications(threadedData);
@@ -124,11 +180,13 @@ public class Chunk
 
         CreateMesh(threadedData);
 
+
         if (threadedData.Valid)
             Monitor.Exit(this);
     }
     public void ApplyModifications(Chunk.chunkUpdateThreadData threadedData = default)
     {
+        SetChunkFlag(eChunkFlags.DECORATING);
         Vector3 threaded_chunkPosition = Vector3.zero;
         if (threadedData.Valid) //This will only ever execute if isThreadedCall is TRUE
             threaded_chunkPosition = threadedData.ChunkPosition;
@@ -141,6 +199,8 @@ public class Chunk
                 : position;
             voxelMap[(int)pos.x, (int)pos.y, (int)pos.z] = v.id;
         }
+        ClearChunkFlag(eChunkFlags.DECORATING);
+        SetChunkFlag(eChunkFlags.DECORATED);
     }
     // 0 is within chunk, not within worldspace
     bool IsVoxelInChunk(int x, int y, int z)
@@ -308,6 +368,7 @@ public class Chunk
 
     void CreateMesh(Chunk.chunkUpdateThreadData threadedData = default)
     {
+
         Action applyMeshData = new Action(() =>
         {
             // Build Mesh
@@ -335,7 +396,9 @@ public class Chunk
             result.Wait();
         }
         else
+        {
             applyMeshData();
+        }
     }
 
     void ClearMeshData()
@@ -358,25 +421,27 @@ public class Chunk
     Debug.LogError($"Chunk ({coord.x}, {coord.z})'s {nameof(isActive)} property was accessed (write) while the chunkObject was null");
     #endif
      */
+
+    public bool _isActive = false;
     public bool isActive
     {
         get
         {
-            return _isActive;
+            if (chunkObject == null)
+                return false;
+            else
+                return chunkObject.activeSelf;
         }
         set
         {
-            _isActive = value;
             if (chunkObject != null)
             {
                 chunkObject.SetActive(value);
+                if (!value && world.activeChunks.Contains(this.coord))
+                    world.activeChunks.Remove(this.coord);
+                else if (value && !world.activeChunks.Contains(this.coord))
+                    world.activeChunks.Add(this.coord);
             }
-            //TODO: This will most likely need a threadlock (lock) on the adding/removing for enumerator iteration in other threads.
-            //if (!value && world.activeChunks.Contains(this.coord))
-            //    world.activeChunks.Remove(this.coord);
-            //else if (value && !world.activeChunks.Contains(this.coord))
-            //    world.activeChunks.Add(this.coord);
-            //chunkObject.SetActive(value);
         }
     }
 
