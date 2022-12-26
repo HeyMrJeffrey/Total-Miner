@@ -428,12 +428,13 @@ public class Chunk
         get
         {
             if (chunkObject == null)
-                return false;
+                return _isActive;
             else
                 return chunkObject.activeSelf;
         }
         set
         {
+            _isActive = value;
             if (chunkObject != null)
             {
                 chunkObject.SetActive(value);

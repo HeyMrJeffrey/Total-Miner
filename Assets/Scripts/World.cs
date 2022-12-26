@@ -56,6 +56,13 @@ public class World : MonoBehaviour
             {
                 /* APPLYING MODIFICATIONS TO EACH CHUNK'S QUEUE */
 
+                //
+                // *** THIS IS GOOD CODE.  I JUST NEED TO TEST IT A LITTLE MORE AND WORK OUT THE BUGS
+                //
+
+
+                /* DO NOT DELETE THIS CODE */
+
                 //If a chunk has not yet been created then we will throw it into the chunksToCreate, otherwise we will go ahead and apply it's modifications.
                 //It will then loop back around through here at some point after it's been created because we re-queue it's modifications
                 //int numModsToAttempt = modifications.Count;
@@ -258,7 +265,7 @@ public class World : MonoBehaviour
             for (int z = (VoxelData.WorldSizeInChunks / 2) - settings.viewDistance; z < (VoxelData.WorldSizeInChunks / 2) + settings.viewDistance; z++)
             {
                 chunkMap[x, z] = new Chunk(new ChunkCoord(x, z), this, true);
-                activeChunks.Add(new ChunkCoord(x, z));
+                chunkMap[x,z].isActive = true;
             }
         }
 
