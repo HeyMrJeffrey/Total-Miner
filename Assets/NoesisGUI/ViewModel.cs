@@ -68,11 +68,8 @@ namespace TotalMinerUnity
             State = State.Start;
 #if NOESIS
             World w = (new GameObject("World")).AddComponent<World>();
-
+            w.Init();
             //need loading screen
-
-
-
 
 #endif
         }

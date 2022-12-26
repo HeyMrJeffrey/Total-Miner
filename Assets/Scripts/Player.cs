@@ -15,10 +15,10 @@ public class Player : MonoBehaviour
     public float walkSpeed = 3f;
     public float sprintSpeed = 6f;
     public float playerHeight = 1.8f; // some avatars may need to change this value
-    public float gravity = -5f;     // should gravity be a private static value?
+    public float gravity = -8f;     // should gravity be a private static value?
     public float jumpForce = 5f;
 
-    public float playerWidth = 0.15f;   // using capsule collider so we dont need height
+    public float playerWidth = 0.15f;   // using capsule collider so we dont need width
 
     private float horizontal;
     private float vertical;
@@ -39,26 +39,20 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
+        
+    }
+
+    public void Init(World _world)
+    {
         cameraTransform = Globals.MainCamera.transform;
         Globals.MainCamera.transform.SetParent(transform);
         transform.position = new Vector3(80, 100, 80);
-        walkSpeed = 3;
-        sprintSpeed = 6;
-        playerWidth = 0.25f;
-        playerHeight = 1.8f;
         cameraTransform.localPosition = new Vector3(0, playerHeight, 0);
-        gravity = -8;
-        jumpForce = 5;
         highlightBlock = GameObject.Find("HighlightBlock").transform;
         placeBlock = GameObject.Find("PlaceHighlightBlock").transform;
-        checkIncrement = 0.1f;
-        reach = 8;
         toolbar = GameObject.Find("Toolbar").GetComponent<Toolbar>();
-        
-
-        //world = GameObject.Find("World").GetComponent<World>();
-
-        //world.inUI = false;
+        world = _world;
+        world.inUI = false;
     }
 
     private void FixedUpdate()

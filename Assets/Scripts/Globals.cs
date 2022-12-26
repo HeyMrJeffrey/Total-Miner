@@ -9,7 +9,6 @@ internal class Globals
 {
     public static MainThreadQueue MTQ;
     public static GameObject MainCamera;
-    public static World World;
     public static MainWindow MainWindow;
     public static ViewModel MainViewModel;
 }

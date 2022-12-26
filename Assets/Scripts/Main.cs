@@ -13,7 +13,7 @@ public class Main : MonoBehaviour
     {
         Globals.MainCamera = GameObject.Find("Main Camera");
         Globals.MainWindow = Globals.MainCamera.GetComponent<NoesisView>().Content as MainWindow;
-
+        Globals.MTQ = new MainThreadQueue();
         Globals.MainWindow.Loaded += (object sender, RoutedEventArgs e) => 
         {
             Globals.MainViewModel = Globals.MainWindow.DataContext as ViewModel;
