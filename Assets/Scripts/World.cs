@@ -288,36 +288,36 @@ public class World : MonoBehaviour
                 //If a chunk has not yet been created then we will throw it into the chunksToCreate, otherwise we will go ahead and apply it's modifications.
                 //It will then loop back around through here at some point after it's been created because we re-queue it's modifications
                 int numModsToAttempt = modifications.Count;
-                for (int i = 0; i < numModsToAttempt; i++)
-                {
-                    //We don't want to dequeue the 
-                    VoxelMod mod = modifications.Dequeue();
-                    ChunkCoord coord = GetChunkCoordFromVector3(mod.position);
-                    if (coord.x >= 0 && coord.x < VoxelData.WorldSizeInChunks && coord.z >= 0 && coord.z < VoxelData.WorldSizeInChunks)
-                    {
-                        //The voxel mod is in the world bounds.
-                        //We will now check to see if the chunk associated with this voxelmod has been created.
-                        Chunk targetChunk = null;
-                        if ((targetChunk = chunkMap[coord.x, coord.z]) == null)
-                        {
-                            //The chunk hasn't been created, let's add it to the chunksToCreateList.
-                            chunksToCreate.Add(coord);
-                            modifications.Enqueue(mod);
-                            continue;
-                        }
-                        else
-                        {
-                            //The chunk exists, let's queue it's voxelmod.
-                            targetChunk.modifications.Enqueue(mod);
-                            if (!chunksToAddToUpdateList.Contains(targetChunk))
-                                chunksToAddToUpdateList.Add(targetChunk); //We don't use `AddChunkToUpdateList` because that acquires a lock and we already have one.
-                        }
-                    }
-                    else
-                    {
-                        //Voxel mod out of world bounds.  Drop it.
-                    }
-                }
+                //for (int i = 0; i < numModsToAttempt; i++)
+                //{
+                //    //We don't want to dequeue the 
+                //    VoxelMod mod = modifications.Dequeue();
+                //    ChunkCoord coord = GetChunkCoordFromVector3(mod.position);
+                //    if (coord.x >= 0 && coord.x < VoxelData.WorldSizeInChunks && coord.z >= 0 && coord.z < VoxelData.WorldSizeInChunks)
+                //    {
+                //        //The voxel mod is in the world bounds.
+                //        //We will now check to see if the chunk associated with this voxelmod has been created.
+                //        Chunk targetChunk = null;
+                //        if ((targetChunk = chunkMap[coord.x, coord.z]) == null)
+                //        {
+                //            //The chunk hasn't been created, let's add it to the chunksToCreateList.
+                //            chunksToCreate.Add(coord);
+                //            modifications.Enqueue(mod);
+                //            continue;
+                //        }
+                //        else
+                //        {
+                //            //The chunk exists, let's queue it's voxelmod.
+                //            targetChunk.modifications.Enqueue(mod);
+                //            if (!chunksToAddToUpdateList.Contains(targetChunk))
+                //                chunksToAddToUpdateList.Add(targetChunk); //We don't use `AddChunkToUpdateList` because that acquires a lock and we already have one.
+                //        }
+                //    }
+                //    else
+                //    {
+                //        //Voxel mod out of world bounds.  Drop it.
+                //    }
+                //}
 
 
                 for (int i = 0; i < chunksToAddToUpdateList.Count; i++)
