@@ -45,89 +45,7 @@ public class World : MonoBehaviour
     // TESTING THREADING STUPID SHIT.
     public Thread chunkUpdateThread;
 
-    public void chunkUpdateThreaded()
-    {
-        //AutoResetEvent reset = new AutoResetEvent(false);
-        while (true)
-        {
 
-            lock (chunksToUpdateLock)
-            {
-                /* APPLYING MODIFICATIONS TO EACH CHUNK'S QUEUE */
-
-                //
-                // *** THIS IS GOOD CODE.  I JUST NEED TO TEST IT A LITTLE MORE AND WORK OUT THE BUGS
-                //
-
-
-                /* DO NOT DELETE THIS CODE */
-
-                //If a chunk has not yet been created then we will throw it into the chunksToCreate, otherwise we will go ahead and apply it's modifications.
-                //It will then loop back around through here at some point after it's been created because we re-queue it's modifications
-                int numModsToAttempt = modifications.Count;
-                for (int i = 0; i < numModsToAttempt; i++)
-                {
-                    //We don't want to dequeue the 
-                    VoxelMod mod = modifications.Dequeue();
-                    ChunkCoord coord = GetChunkCoordFromVector3(mod.position);
-                    if (coord.x >= 0 && coord.x < VoxelData.WorldSizeInChunks && coord.z >= 0 && coord.z < VoxelData.WorldSizeInChunks)
-                    {
-                        //The voxel mod is in the world bounds.
-                        //We will now check to see if the chunk associated with this voxelmod has been created.
-                        Chunk targetChunk = null;
-                        if ((targetChunk = chunkMap[coord.x, coord.z]) == null)
-                        {
-                            //The chunk hasn't been created, let's add it to the chunksToCreateList.
-                            chunksToCreate.Add(coord);
-                            modifications.Enqueue(mod);
-                            continue;
-                        }
-                        else
-                        {
-                            //The chunk exists, let's queue it's voxelmod.
-                            targetChunk.modifications.Enqueue(mod);
-                            if (!chunksToAddToUpdateList.Contains(targetChunk))
-                                chunksToAddToUpdateList.Add(targetChunk); //We don't use `AddChunkToUpdateList` because that acquires a lock and we already have one.
-                        }
-                    }
-                    else
-                    {
-                        //Voxel mod out of world bounds.  Drop it.
-                    }
-                }
-
-
-                for (int i = 0; i < chunksToAddToUpdateList.Count; i++)
-                {
-                    var targetChunk = chunksToAddToUpdateList[0];
-                    chunksToAddToUpdateList.RemoveAt(0);
-                    chunksToUpdate.Add(targetChunk);
-                }
-            }
-
-            /* UPDATING THE CHUNKS */
-
-            int maxToUpdate = 4;
-            int numToUpdate = Math.Min(maxToUpdate, chunksToUpdate.Count);
-            for (int i = 0; i < numToUpdate; i++)
-            {
-                var targetChunk = chunksToUpdate[0];
-
-                Chunk.chunkUpdateThreadData updateData = default;
-                updateData.ChunkPosition = new Vector3(targetChunk.coord.x * VoxelData.ChunkWidth, 0, targetChunk.coord.z * VoxelData.ChunkWidth);
-                updateData.Valid = true;
-
-                if (!targetChunk.IsGenerated)
-                    targetChunk.PopulateVoxelMap();
-
-                chunksToUpdate[0].UpdateChunk(updateData);
-
-                chunksToUpdate.RemoveAt(0);
-            }
-            System.Threading.Thread.Sleep(1);
-            // reset.Set();
-        }
-    }
     // Modifications to a chunk (trees overlapping chunks)
     volatile Queue<VoxelMod> modifications = new Queue<VoxelMod>();
 
@@ -222,7 +140,7 @@ public class World : MonoBehaviour
         // TESTING THREADING SHIT
         if (Multithreading)
         {
-            chunkUpdateThread = new Thread(chunkUpdateThreaded);
+            chunkUpdateThread = new Thread(UpdateChunksThreaded);
             chunkUpdateThread.Start();
         }
     }
@@ -330,7 +248,6 @@ public class World : MonoBehaviour
             AddChunkToUpdateList(chunkMap[coord.x, coord.z]);
         }
     }
-
     void UpdateChunks()
     {
         Assert.IsTrue(!Multithreading, "UpdateChunks cannot be called if multithreading is active.");
@@ -349,6 +266,89 @@ public class World : MonoBehaviour
             {
                 index++;
             }
+        }
+    }
+    public void UpdateChunksThreaded()
+    {
+        //AutoResetEvent reset = new AutoResetEvent(false);
+        while (true)
+        {
+
+            lock (chunksToUpdateLock)
+            {
+                /* APPLYING MODIFICATIONS TO EACH CHUNK'S QUEUE */
+
+                //
+                // *** THIS IS GOOD CODE.  I JUST NEED TO TEST IT A LITTLE MORE AND WORK OUT THE BUGS
+                //
+
+
+                /* DO NOT DELETE THIS CODE */
+
+                //If a chunk has not yet been created then we will throw it into the chunksToCreate, otherwise we will go ahead and apply it's modifications.
+                //It will then loop back around through here at some point after it's been created because we re-queue it's modifications
+                int numModsToAttempt = modifications.Count;
+                for (int i = 0; i < numModsToAttempt; i++)
+                {
+                    //We don't want to dequeue the 
+                    VoxelMod mod = modifications.Dequeue();
+                    ChunkCoord coord = GetChunkCoordFromVector3(mod.position);
+                    if (coord.x >= 0 && coord.x < VoxelData.WorldSizeInChunks && coord.z >= 0 && coord.z < VoxelData.WorldSizeInChunks)
+                    {
+                        //The voxel mod is in the world bounds.
+                        //We will now check to see if the chunk associated with this voxelmod has been created.
+                        Chunk targetChunk = null;
+                        if ((targetChunk = chunkMap[coord.x, coord.z]) == null)
+                        {
+                            //The chunk hasn't been created, let's add it to the chunksToCreateList.
+                            chunksToCreate.Add(coord);
+                            modifications.Enqueue(mod);
+                            continue;
+                        }
+                        else
+                        {
+                            //The chunk exists, let's queue it's voxelmod.
+                            targetChunk.modifications.Enqueue(mod);
+                            if (!chunksToAddToUpdateList.Contains(targetChunk))
+                                chunksToAddToUpdateList.Add(targetChunk); //We don't use `AddChunkToUpdateList` because that acquires a lock and we already have one.
+                        }
+                    }
+                    else
+                    {
+                        //Voxel mod out of world bounds.  Drop it.
+                    }
+                }
+
+
+                for (int i = 0; i < chunksToAddToUpdateList.Count; i++)
+                {
+                    var targetChunk = chunksToAddToUpdateList[0];
+                    chunksToAddToUpdateList.RemoveAt(0);
+                    chunksToUpdate.Add(targetChunk);
+                }
+            }
+
+            /* UPDATING THE CHUNKS */
+
+            int maxToUpdate = 4;
+            int numToUpdate = Math.Min(maxToUpdate, chunksToUpdate.Count);
+            for (int i = 0; i < numToUpdate; i++)
+            {
+                var targetChunk = chunksToUpdate[0];
+
+                Chunk.chunkUpdateThreadData updateData = default;
+                updateData.ChunkPosition = new Vector3(targetChunk.coord.x * VoxelData.ChunkWidth, 0, targetChunk.coord.z * VoxelData.ChunkWidth);
+                updateData.Valid = true;
+
+                if (!targetChunk.IsGenerated)
+                    targetChunk.PopulateVoxelMap();
+
+                chunksToUpdate[0].UpdateChunk(updateData);
+
+                chunksToUpdate.RemoveAt(0);
+            }
+            System.Threading.Thread.Sleep(1);
+            // reset.Set();
         }
     }
     IEnumerator ApplyModifications()
