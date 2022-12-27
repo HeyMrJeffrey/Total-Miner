@@ -60,30 +60,37 @@
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
     <Compile Include="Assets\NoesisGUI\DelegateCommand.cs" />
+    <Compile Include="Assets\NoesisGUI\MainMenu\MainMenuContainer.xaml.cs">
+      <DependentUpon>MainMenuContainer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Assets\NoesisGUI\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Assets\NoesisGUI\SubMenuTest.xaml.cs">
-      <DependentUpon>SubMenuTest.xaml</DependentUpon>
+    <Compile Include="Assets\NoesisGUI\MainMenu\SettingsMenu.xaml.cs">
+      <DependentUpon>SettingsMenu.xaml</DependentUpon>
     </Compile>
     <Compile Include="Assets\NoesisGUI\ViewModel.cs" />
     <Compile Include="Blend\App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Assets\NoesisGUI\MainMenu\MainMenuContainer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Assets\NoesisGUI\MainWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Assets\NoesisGUI\SubMenuTest.xaml">
+    <Page Include="Assets\NoesisGUI\MainMenu\SettingsMenu.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Assets\NoesisGUI\MainMenu.xaml">
+    <Page Include="Assets\NoesisGUI\MainMenu\MainMenu.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="Assets\NoesisGUI\MainMenu.xaml.cs">
+    <Compile Include="Assets\NoesisGUI\MainMenu\MainMenu.xaml.cs">
       <DependentUpon>MainMenu.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
@@ -92,6 +99,115 @@
     <PackageReference Include="Noesis.GUI.Extensions">
       <Version>3.0.*</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen10.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen100.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen101.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen102.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen103.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen104.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen105.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen106.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen107.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen108.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen109.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen11.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen110.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen111.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen112.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen113.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen12.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen13.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen14.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen15.jpg" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen16.jpg" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen18.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen19.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen2.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen20.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen21.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen22.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen23.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen24.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen25.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen26.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen27.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen28.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen29.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen3.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen30.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen31.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen32.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen33.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen34.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen35.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen36.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen37.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen38.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen39.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen40.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen41.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen42.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen43.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen44.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen45.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen46.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen47.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen48.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen49.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen5.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen50.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen51.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen52.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen53.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen54.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen55.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen56.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen57.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen58.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen59.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen6.jpg" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen60.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen61.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen62.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen63.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen64.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen65.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen66.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen67.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen68.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen69.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen7.jpg" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen70.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen71.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen72.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen73.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen74.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen75.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen76.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen79.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen8.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen80.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen81.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen83.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen84.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen85.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen86.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen87.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen88.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen89.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen9.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen90.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen91.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen92.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen93.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen94.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen95.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen96.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen97.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen98.png" />
+    <Resource Include="Assets\NoesisGUI\MainMenu\Images\BackgroundScreen99.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

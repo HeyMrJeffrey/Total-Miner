@@ -12,7 +12,7 @@ using System.ComponentModel;
 using System.Windows.Input;
 #endif
 
-namespace TotalMinerUnity
+namespace TotalMinerUnity.Menus
 {
     public enum State
     {

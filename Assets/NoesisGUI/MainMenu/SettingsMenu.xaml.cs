@@ -6,14 +6,14 @@ using System;
 using System.Windows.Controls;
 #endif
 
-namespace TotalMinerUnity
+namespace TotalMinerUnity.Menus
 {
     /// <summary>
     /// Interaction logic for SubMenuTest.xaml
     /// </summary>
-    public partial class SubMenuTest : UserControl
+    public partial class SettingsMenu : UserControl
     {
-        public SubMenuTest()
+        public SettingsMenu()
         {
             InitializeComponent();
         }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using TotalMinerUnity;
+using TotalMinerUnity.Menus;
 internal class Globals
 {
     public static MainThreadQueue MTQ;
