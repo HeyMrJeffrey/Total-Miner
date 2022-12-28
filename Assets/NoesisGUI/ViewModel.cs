@@ -72,7 +72,7 @@ namespace TotalMinerUnity.Menus
 #if NOESIS
         private Queue<Texture2D> MainMenuBackgroundInUse = new Queue<Texture2D>();
 #endif
-        public ImageSource SomeImage
+        public ImageSource BackgroundImage1
         {
             get
             {
@@ -93,7 +93,7 @@ namespace TotalMinerUnity.Menus
 
 
 
-        public ImageSource SomeImage2
+        public ImageSource BackgroundImage2
         {
             get 
             {
@@ -143,12 +143,12 @@ namespace TotalMinerUnity.Menus
 
         private void OnChangeBackground1(object parameter)
         {
-            OnPropertyChanged("SomeImage");
+            OnPropertyChanged("BackgroundImage1");
         }
 
         private void OnChangeBackground2(object parameter)
         {
-            OnPropertyChanged("SomeImage2");
+            OnPropertyChanged("BackgroundImage2");
         }
 
         private void OnBack(object parameter)

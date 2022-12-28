@@ -98,5 +98,8 @@
       <Version>3.0.*</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\NoesisGUI\MainMenu\DesignBackground.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

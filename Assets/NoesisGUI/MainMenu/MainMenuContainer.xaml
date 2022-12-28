@@ -71,10 +71,14 @@
 
     <Grid Background="Black">
 
+        <Grid.Resources>
+            <ImageSource x:Key="DesignImage">DesignBackground.png</ImageSource>
+        </Grid.Resources>
+
         <Viewbox Stretch="UniformToFill">
             <Grid>
-                <Image x:Name="background1" Source="{Binding SomeImage}" Panel.ZIndex="2" />
-                <Image x:Name="background2" Source="{Binding SomeImage2}" Panel.ZIndex="1"/>
+                <Image x:Name="background1" Source="{Binding BackgroundImage2}" d:Source="{StaticResource DesignImage}" Panel.ZIndex="2" />
+                <Image x:Name="background2" Source="{Binding BackgroundImage2}" Panel.ZIndex="1"/>
             </Grid>
         </Viewbox>
 
