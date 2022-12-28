@@ -2,6 +2,7 @@
 #if UNITY_5_3_OR_NEWER
 #define NOESIS
 using Noesis;
+using UnityEngine;
 #else
 using System;
 using System.Windows;
@@ -12,15 +13,21 @@ using System.Windows.Media.Animation;
 
 namespace TotalMinerUnity.Menus
 {
-    /// <summary>
-    /// Interaction logic for MainMenuContainer.xaml
-    /// </summary>
     public partial class MainMenuContainer : UserControl
     {
+        string SomeImage3 = "Assets/NoesisGUI/MainMenu/Images/BackgroundScreen6.png";
+
 
         public MainMenuContainer()
         {
             this.InitializeComponent();
+        }
+
+        public void test()
+        {
+#if NOESIS
+            Debug.Log("hit");
+#endif
         }
 
 
@@ -29,8 +36,18 @@ namespace TotalMinerUnity.Menus
         {
             NoesisUnity.LoadComponent(this);
         }
-
 #endif
+
+
+        public void Test(object parameter)
+        {
+#if NOESIS
+            Debug.Log("hit");
+#endif
+        }
+
+
+
     }
 
-}
+    }

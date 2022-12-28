@@ -12,5 +12,6 @@ internal class Globals
     public static GameObject MainCamera;
     public static MainWindow MainWindow;
     public static ViewModel MainViewModel;
+    public static Queue<Texture2D> MainMenuBackgrounds;
 }
 
