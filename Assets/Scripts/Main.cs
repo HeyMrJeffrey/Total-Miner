@@ -19,13 +19,13 @@ public class Main : MonoBehaviour
 
 
 
-        int random = UnityEngine.Random.Range(5, 11);
+        int random = UnityEngine.Random.Range(1, 113);
         Globals.MainMenuBackgrounds.Enqueue((Texture2D)Resources.Load($"Images/BackgroundScreen{random}"));
-        random = GetRandomInRangeWithContext(random, 5, 11);
+        random = GetRandomInRangeWithContext(random, 1, 113);
         Globals.MainMenuBackgrounds.Enqueue((Texture2D)Resources.Load($"Images/BackgroundScreen{random}"));
-        random = GetRandomInRangeWithContext(random, 5, 11);
+        random = GetRandomInRangeWithContext(random, 1, 113);
         Globals.MainMenuBackgrounds.Enqueue((Texture2D)Resources.Load($"Images/BackgroundScreen{random}"));
-        random = GetRandomInRangeWithContext(random, 5, 11);
+        random = GetRandomInRangeWithContext(random, 1, 113);
         Globals.MainMenuBackgrounds.Enqueue((Texture2D)Resources.Load($"Images/BackgroundScreen{random}"));
 
 
@@ -44,7 +44,7 @@ public class Main : MonoBehaviour
     {
         if(Globals.MainMenuBackgrounds != null && Globals.MainMenuBackgrounds.Count < 4)
         {
-            Globals.MainMenuBackgrounds.Enqueue((Texture2D)Resources.Load($"Images/BackgroundScreen{UnityEngine.Random.Range(5, 11)}"));
+            Globals.MainMenuBackgrounds.Enqueue((Texture2D)Resources.Load($"Images/BackgroundScreen{UnityEngine.Random.Range(1, 113)}"));
         }
 
     }

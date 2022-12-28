@@ -68,19 +68,6 @@ namespace TotalMinerUnity.Menus
             }
         }
 
-        int _bs = 0;
-        public int bs
-        {
-            get { return _bs; }
-            set
-            {
-                if (_bs != value)
-                {
-                    _bs = value;
-                    OnPropertyChanged("bs");
-                }
-            }
-        }
 
 #if NOESIS
         private Queue<Texture2D> MainMenuBackgroundInUse = new Queue<Texture2D>();
@@ -105,12 +92,6 @@ namespace TotalMinerUnity.Menus
         }
 
 
-        public void test()
-        {
-#if NOESIS
-            Debug.Log("hit2");
-#endif
-        }
 
         public ImageSource SomeImage2
         {
@@ -162,18 +143,12 @@ namespace TotalMinerUnity.Menus
 
         private void OnChangeBackground1(object parameter)
         {
-#if NOESIS
-
             OnPropertyChanged("SomeImage");
-#endif
         }
 
-        bool background1Active = true;
         private void OnChangeBackground2(object parameter)
         {
-#if NOESIS
             OnPropertyChanged("SomeImage2");
-#endif
         }
 
         private void OnBack(object parameter)
