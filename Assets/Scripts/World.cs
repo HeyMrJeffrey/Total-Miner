@@ -95,7 +95,7 @@ public class World : MonoBehaviour
                 new BlockType("Sand", blockSprites["TP_OriginalHD_Icons_Sand"], 3),
                 new BlockType("Dirt", blockSprites["TP_OriginalHD_Icons_Dirt"], 2),
                 new BlockType("Wood", blockSprites["TP_OriginalHD_Icons_Wood"], 261,261,5,5,5,5),
-                new BlockType("WoodPlanks", blockSprites["TP_OriginalHD_Icons_WoodPlanks"], 6),
+                new BlockType("WoodPlanks", blockSprites["TP_OriginalHD_Icons_WoodPlanks"], 6, false, true, BlockType.eBlockMeshTypes.HALF_SLAB_BLOCK, false),
                 new BlockType("Bricks", blockSprites["TP_OriginalHD_Icons_Bricks"], 43),
                 new BlockType("Cobblestone",blockSprites["TP_OriginalHD_Icons_Cobblestone"],  42),
                 new BlockType("Glass", blockSprites["TP_OriginalHD_Icons_Glass"], 9, true),
@@ -643,9 +643,17 @@ public class World : MonoBehaviour
         else
             voxelValue = 2; //Stone'
 
+        /* CAVE PASS */
+        //if (yPos < terrainHeight)
+        //{
+        //    if (Noise.Get3DPerlin(pos,123f,13f,0.5f))
+        //    {
+        //        voxelValue = 0;
+        //    }
+        //}
+
 
         /* SECOND PASS */
-
         if (voxelValue == 2) //if Stone
         {
             foreach (Lode lode in biome.Lodes)
@@ -699,6 +707,21 @@ public class World : MonoBehaviour
         }
 
         return blockTypes[GetVoxel(pos)].isTransparent;
+    }
+
+    public bool CheckIfVoxelStandard(Vector3 pos, Chunk.chunkUpdateThreadData threadedData = default)
+    {
+        ChunkCoord thisChunk = new ChunkCoord(pos);
+
+        if (!IsChunkInWorld(thisChunk) || pos.y < 0 || pos.y > VoxelData.ChunkHeight)
+            return false;
+
+        if (chunkMap[thisChunk.x, thisChunk.z] != null && chunkMap[thisChunk.x, thisChunk.z].IsGenerated)
+        {
+            return blockTypes[chunkMap[thisChunk.x, thisChunk.z].GetVoxelFromGlobalVector3(pos, threadedData)].isStandard;
+        }
+
+        return blockTypes[GetVoxel(pos)].isStandard;
     }
 
     ChunkCoord GetChunkCoordFromVector3(Vector3 pos)
@@ -773,7 +796,9 @@ public class BlockType
     public string blockName;
     public bool isSolid;         //Whether the block is physically there (can player pass through the block like air? or not)
     public bool isTransparent;    //Whether the block can be seen through by the player
+    public bool isStandard;
     public Sprite icon;
+    public VoxelMeshBuilder meshData;
 
     [Header("Texture Values")]
     public int backFaceTexture;
@@ -783,7 +808,14 @@ public class BlockType
     public int leftFaceTexture;
     public int rightFaceTexture;
 
-    public BlockType(string name, Sprite icon, int texNum, bool isTransparent = false, bool isSolid = true)
+    public enum eBlockMeshTypes
+    {
+        STANDARD_BLOCK,
+        HALF_SLAB_BLOCK,
+        STAIR_BLOCK
+    }
+
+    public BlockType(string name, Sprite icon, int texNum, bool isTransparent = false, bool isSolid = true, eBlockMeshTypes meshData = eBlockMeshTypes.STANDARD_BLOCK, bool isStandard = true)
     {
         blockName = name;
         this.isTransparent = isTransparent;
@@ -795,9 +827,11 @@ public class BlockType
         leftFaceTexture =
         rightFaceTexture = texNum;
         this.icon = icon;
+        this.meshData = VoxelMeshBuilder.GenerateBlockMesh(meshData);
+        this.isStandard = isStandard;   
     }
 
-    public BlockType(string name, Sprite icon, int texNumTop, int texNumBottom, int texNumLeft, int texNumRight, int texNumFront, int texNumBack, bool isTransparent = false, bool isSolid = true)
+    public BlockType(string name, Sprite icon, int texNumTop, int texNumBottom, int texNumLeft, int texNumRight, int texNumFront, int texNumBack, bool isTransparent = false, bool isSolid = true, eBlockMeshTypes meshData = eBlockMeshTypes.STANDARD_BLOCK, bool isStandard = true)
     {
         blockName = name;
         this.isTransparent = isTransparent;
@@ -809,6 +843,8 @@ public class BlockType
         leftFaceTexture = texNumLeft;
         rightFaceTexture = texNumRight;
         this.icon = icon;
+        this.meshData = VoxelMeshBuilder.GenerateBlockMesh(meshData);
+        this.isStandard = isStandard;
     }
 
     // Back Front Top Bottom Left Right
