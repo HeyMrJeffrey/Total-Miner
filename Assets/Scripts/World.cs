@@ -10,6 +10,7 @@ using UnityEditor;
 using UnityEngine.TextCore.Text;
 using UnityEngine.U2D;
 using UnityEngine.Assertions;
+using System.Linq;
 
 public class World : MonoBehaviour
 {
@@ -47,7 +48,8 @@ public class World : MonoBehaviour
 
 
     // Modifications to a chunk (trees overlapping chunks)
-    volatile Queue<VoxelMod> modifications = new Queue<VoxelMod>();
+    //volatile Queue<VoxelMod> modifications = new Queue<VoxelMod>();
+    public volatile Dictionary<ChunkCoord, Queue<VoxelMod>> modifications = new Dictionary<ChunkCoord, Queue<VoxelMod>>();
 
     // UI - Inventory
     private bool _inUI = false;
@@ -198,30 +200,41 @@ public class World : MonoBehaviour
 
         /// TODO: Everytime we are useing a queue, we need to ensure we are not adding to it elsewhere
         /// Otherwise we may end up in an endless loop (perhaps lock the queue?)
-        while (modifications.Count > 0)
+        /// 
+
+        int modCount = modifications.Count;
+        for (int i = 0; i < modCount; i++)
         {
-            VoxelMod v = modifications.Dequeue();
-            ChunkCoord coord = GetChunkCoordFromVector3(v.position);
-
-            if (coord.x >= 0 && coord.x < VoxelData.WorldSizeInChunks && coord.z >= 0 && coord.z < VoxelData.WorldSizeInChunks)
+            var item = modifications.ElementAt(0);
+            while (item.Value.Count > 0)
             {
+                VoxelMod v = item.Value.Dequeue();
+                ChunkCoord coord = GetChunkCoordFromVector3(v.position);
 
-                // If a modification is occuring on a chunk that isnt genned, but on the border of one that is
-                // i.e. a tree on a genned chunk that has leaves on a non genned chunk
-                // gen that chunk
-                if (chunkMap[coord.x, coord.z] == null)
+                if (coord.x >= 0 && coord.x < VoxelData.WorldSizeInChunks && coord.z >= 0 && coord.z < VoxelData.WorldSizeInChunks)
                 {
-                    chunkMap[coord.x, coord.z] = new Chunk(coord, this, false);
-                    chunkMap[coord.x, coord.z].Init(true, false);
+
+                    // If a modification is occuring on a chunk that isnt genned, but on the border of one that is
+                    // i.e. a tree on a genned chunk that has leaves on a non genned chunk
+                    // gen that chunk
+                    if (chunkMap[coord.x, coord.z] == null)
+                    {
+                        chunkMap[coord.x, coord.z] = new Chunk(coord, this, false);
+                        chunkMap[coord.x, coord.z].Init(true, false);
+                    }
+
+                    // Enqueueing into the chunk modifications, not the world modifications
+                    chunkMap[coord.x, coord.z].modifications.Enqueue(v);
+                    if (!chunksToUpdate.Contains(chunkMap[coord.x, coord.z]))
+                        chunksToUpdate.Add(chunkMap[coord.x, coord.z]);
+
                 }
-
-                // Enqueueing into the chunk modifications, not the world modifications
-                chunkMap[coord.x, coord.z].modifications.Enqueue(v);
-                if (!chunksToUpdate.Contains(chunkMap[coord.x, coord.z]))
-                    chunksToUpdate.Add(chunkMap[coord.x, coord.z]);
-
             }
+            modifications.Remove(item.Key);
         }
+
+
+
 
         lock (chunksToUpdateLock)
         {
@@ -285,39 +298,35 @@ public class World : MonoBehaviour
 
                 /* DO NOT DELETE THIS CODE */
 
-                //If a chunk has not yet been created then we will throw it into the chunksToCreate, otherwise we will go ahead and apply it's modifications.
-                //It will then loop back around through here at some point after it's been created because we re-queue it's modifications
-                int numModsToAttempt = modifications.Count;
-                //for (int i = 0; i < numModsToAttempt; i++)
-                //{
-                //    //We don't want to dequeue the 
-                //    VoxelMod mod = modifications.Dequeue();
-                //    ChunkCoord coord = GetChunkCoordFromVector3(mod.position);
-                //    if (coord.x >= 0 && coord.x < VoxelData.WorldSizeInChunks && coord.z >= 0 && coord.z < VoxelData.WorldSizeInChunks)
-                //    {
-                //        //The voxel mod is in the world bounds.
-                //        //We will now check to see if the chunk associated with this voxelmod has been created.
-                //        Chunk targetChunk = null;
-                //        if ((targetChunk = chunkMap[coord.x, coord.z]) == null)
-                //        {
-                //            //The chunk hasn't been created, let's add it to the chunksToCreateList.
-                //            chunksToCreate.Add(coord);
-                //            modifications.Enqueue(mod);
-                //            continue;
-                //        }
-                //        else
-                //        {
-                //            //The chunk exists, let's queue it's voxelmod.
-                //            targetChunk.modifications.Enqueue(mod);
-                //            if (!chunksToAddToUpdateList.Contains(targetChunk))
-                //                chunksToAddToUpdateList.Add(targetChunk); //We don't use `AddChunkToUpdateList` because that acquires a lock and we already have one.
-                //        }
-                //    }
-                //    else
-                //    {
-                //        //Voxel mod out of world bounds.  Drop it.
-                //    }
-                //}
+                int numModsToAttempt = modifications.Sum(x => x.Value.Count);
+                int numModsAttempted = 0;
+                for (int i = 0; i < modifications.Count; i++)
+                {
+                    var targetPair = modifications.ElementAt(0);
+                    for (int n = 0; n < targetPair.Value.Count; n++)
+                    {
+                        if (numModsAttempted >= numModsToAttempt)
+                            goto exitLoops;
+
+                        var vm = targetPair.Value.Dequeue();
+                        var targetCoord = GetChunkCoordFromVector3(vm.position);
+                        var targetChunk = chunkMap[targetCoord.x, targetCoord.z];
+                        if (targetChunk == null)
+                        {
+                            chunksToCreate.Add(targetCoord);
+                            targetPair.Value.Enqueue(vm);
+                        }
+                        else
+                        {
+                            targetChunk.modifications.Enqueue(vm);
+                            if (!chunksToAddToUpdateList.Contains(targetChunk))
+                                chunksToAddToUpdateList.Add(targetChunk);
+                        }
+                        numModsAttempted++;
+                    }
+                    modifications.Remove(targetPair.Key);
+                }
+                exitLoops:
 
 
                 for (int i = 0; i < chunksToAddToUpdateList.Count; i++)
@@ -355,37 +364,44 @@ public class World : MonoBehaviour
     {
         int count = 0;
 
-        while (modifications.Count > 0)
+        int modCount = modifications.Count;
+        for (int i = 0; i < modCount; i++)
         {
-            VoxelMod v = modifications.Dequeue();
-            ChunkCoord coord = GetChunkCoordFromVector3(v.position);
-
-            if (coord.x >= 0 && coord.x < VoxelData.WorldSizeInChunks && coord.z >= 0 && coord.z < VoxelData.WorldSizeInChunks)
+            var item = modifications.ElementAt(0);
+            while (modifications.Count > 0)
             {
+                VoxelMod v = item.Value.Dequeue();
+                ChunkCoord coord = GetChunkCoordFromVector3(v.position);
 
-                // If a modification is occuring on a chunk that isnt genned, but on the border of one that is
-                // i.e. a tree on a genned chunk that has leaves on a non genned chunk
-                // gen that chunk
-                if (chunkMap[coord.x, coord.z] == null)
+                if (coord.x >= 0 && coord.x < VoxelData.WorldSizeInChunks && coord.z >= 0 && coord.z < VoxelData.WorldSizeInChunks)
                 {
-                    chunkMap[coord.x, coord.z] = new Chunk(coord, this, true);
-                    activeChunks.Add(coord);
-                }
 
-                // Enqueueing into the chunk modifications, not the world modifications
-                chunkMap[coord.x, coord.z].modifications.Enqueue(v);
+                    // If a modification is occuring on a chunk that isnt genned, but on the border of one that is
+                    // i.e. a tree on a genned chunk that has leaves on a non genned chunk
+                    // gen that chunk
+                    if (chunkMap[coord.x, coord.z] == null)
+                    {
+                        chunkMap[coord.x, coord.z] = new Chunk(coord, this, true);
+                        activeChunks.Add(coord);
+                    }
 
-                AddChunkToUpdateList(chunkMap[coord.x, coord.z]);
+                    // Enqueueing into the chunk modifications, not the world modifications
+                    chunkMap[coord.x, coord.z].modifications.Enqueue(v);
 
-                count++;
-                // Only 200 voxel modifications per frame
-                if (count > 200)
-                {
-                    count = 0;
-                    yield return null;
+                    AddChunkToUpdateList(chunkMap[coord.x, coord.z]);
+
+                    count++;
+                    // Only 200 voxel modifications per frame
+                    if (count > 200)
+                    {
+                        count = 0;
+                        yield return null;
+                    }
                 }
             }
+            modifications.Remove(item.Key);
         }
+
 
     }
 
@@ -561,7 +577,11 @@ public class World : MonoBehaviour
         11 = Leaves
         */
 
+        ChunkCoord thisChunk = GetChunkCoordFromVector3(pos);
         int yPos = Mathf.FloorToInt(pos.y);
+
+        if (!modifications.ContainsKey(thisChunk))
+            modifications.Add(thisChunk, new Queue<VoxelMod>());
 
         /* IMMUTABLE PASS */
         // If the current voxel is not in the world, just make it air.
@@ -650,7 +670,8 @@ public class World : MonoBehaviour
 
                 if (Noise.Get2DPerlin(new Vector2(pos.x, pos.z), 0, biome.majorFloraPlacementScale) > biome.majorFloraPlacementThreshold)
                 {
-                    Structure.GenerateMajorFlora(biome.majorFloraIndex, pos, modifications, biome.minHeight, biome.maxHeight);
+
+                    Structure.GenerateMajorFlora(biome.majorFloraIndex, pos, modifications[thisChunk], biome.minHeight, biome.maxHeight);
                 }
             }
         }

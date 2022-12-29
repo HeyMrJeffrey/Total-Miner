@@ -96,6 +96,14 @@ public class Chunk
         coord = _coord;
         world = _world;
 
+        //Get the modifications
+        //if (world.modifications.ContainsKey(this.coord))
+        //{
+        //    for (int i = 0; i < world.modifications[this.coord].Count; i++)
+        //        this.modifications.Enqueue(world.modifications[this.coord].Dequeue());
+        //    world.modifications.Remove(this.coord);
+        //}
+
         SetChunkFlag(eChunkFlags.CREATED);
         ClearChunkFlag(eChunkFlags.CREATING);
 
@@ -149,6 +157,7 @@ public class Chunk
                 {
                     voxelMap[x, y, z] = world.GetVoxel(new Vector3(x, y, z) + positionToUse);
                 }
+
             }
         }
         ClearChunkFlag(eChunkFlags.GENERATING);
@@ -307,6 +316,7 @@ public class Chunk
         int zMod = Mathf.FloorToInt(pos.z) % VoxelData.ChunkWidth;
         return targetChunk.voxelMap[xMod, yMod, zMod];
     }
+
 
     // position - coordinate of the voxel
     void UpdateMeshData(Vector3 position, Chunk.chunkUpdateThreadData threadedData = default)
