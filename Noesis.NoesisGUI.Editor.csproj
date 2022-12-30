@@ -53,71 +53,71 @@
     <UnityVersion>2022.2.1f1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
+    <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\2022.2.1f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.SourceGenerators.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\2022.2.1f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="C:\TotalMinerRepo\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisMenuBlend.cs">
+    <Compile Include="..\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisMenuBlend.cs">
       <Link>Editor\NoesisMenuBlend.cs</Link>
     </Compile>
-    <Compile Include="C:\TotalMinerRepo\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisFontImporter.cs">
+    <Compile Include="..\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisFontImporter.cs">
       <Link>Editor\NoesisFontImporter.cs</Link>
     </Compile>
-    <Compile Include="C:\TotalMinerRepo\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisXamlEditor.cs">
+    <Compile Include="..\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisXamlEditor.cs">
       <Link>Editor\NoesisXamlEditor.cs</Link>
     </Compile>
-    <Compile Include="C:\TotalMinerRepo\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisShaderImporter.cs">
+    <Compile Include="..\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisShaderImporter.cs">
       <Link>Editor\NoesisShaderImporter.cs</Link>
     </Compile>
-    <Compile Include="C:\TotalMinerRepo\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisShaderEditor.cs">
+    <Compile Include="..\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisShaderEditor.cs">
       <Link>Editor\NoesisShaderEditor.cs</Link>
     </Compile>
-    <Compile Include="C:\TotalMinerRepo\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisUpdater.cs">
+    <Compile Include="..\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisUpdater.cs">
       <Link>Editor\NoesisUpdater.cs</Link>
     </Compile>
-    <Compile Include="C:\TotalMinerRepo\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisFontEditor.cs">
+    <Compile Include="..\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisFontEditor.cs">
       <Link>Editor\NoesisFontEditor.cs</Link>
     </Compile>
-    <Compile Include="C:\TotalMinerRepo\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisWelcome.cs">
+    <Compile Include="..\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisWelcome.cs">
       <Link>Editor\NoesisWelcome.cs</Link>
     </Compile>
-    <Compile Include="C:\TotalMinerRepo\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisPostprocessor.cs">
+    <Compile Include="..\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisPostprocessor.cs">
       <Link>Editor\NoesisPostprocessor.cs</Link>
     </Compile>
-    <Compile Include="C:\TotalMinerRepo\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisSettingsBuildProvider.cs">
+    <Compile Include="..\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisSettingsBuildProvider.cs">
       <Link>Editor\NoesisSettingsBuildProvider.cs</Link>
     </Compile>
-    <Compile Include="C:\TotalMinerRepo\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisMenu.cs">
+    <Compile Include="..\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisMenu.cs">
       <Link>Editor\NoesisMenu.cs</Link>
     </Compile>
-    <Compile Include="C:\TotalMinerRepo\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisXamlImporter.cs">
+    <Compile Include="..\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisXamlImporter.cs">
       <Link>Editor\NoesisXamlImporter.cs</Link>
     </Compile>
-    <Compile Include="C:\TotalMinerRepo\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisReview.cs">
+    <Compile Include="..\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisReview.cs">
       <Link>Editor\NoesisReview.cs</Link>
     </Compile>
-    <Compile Include="C:\TotalMinerRepo\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisAbout.cs">
+    <Compile Include="..\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisAbout.cs">
       <Link>Editor\NoesisAbout.cs</Link>
     </Compile>
-    <Compile Include="C:\TotalMinerRepo\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisViewEditor.cs">
+    <Compile Include="..\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisViewEditor.cs">
       <Link>Editor\NoesisViewEditor.cs</Link>
     </Compile>
-    <Compile Include="C:\TotalMinerRepo\NoesisGUI-Unity-3.1.6-Indie\Editor\GoogleAnalyticsHelper.cs">
+    <Compile Include="..\NoesisGUI-Unity-3.1.6-Indie\Editor\GoogleAnalyticsHelper.cs">
       <Link>Editor\GoogleAnalyticsHelper.cs</Link>
     </Compile>
-    <Compile Include="C:\TotalMinerRepo\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisSettingsEditor.cs">
+    <Compile Include="..\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisSettingsEditor.cs">
       <Link>Editor\NoesisSettingsEditor.cs</Link>
     </Compile>
-    <Compile Include="C:\TotalMinerRepo\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisVersion.cs">
+    <Compile Include="..\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisVersion.cs">
       <Link>Editor\NoesisVersion.cs</Link>
     </Compile>
-    <Compile Include="C:\TotalMinerRepo\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisEditor.cs">
+    <Compile Include="..\NoesisGUI-Unity-3.1.6-Indie\Editor\NoesisEditor.cs">
       <Link>Editor\NoesisEditor.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="C:\TotalMinerRepo\NoesisGUI-Unity-3.1.6-Indie\Editor\Noesis.NoesisGUI.Editor.asmdef">
+    <None Include="..\NoesisGUI-Unity-3.1.6-Indie\Editor\Noesis.NoesisGUI.Editor.asmdef">
       <Link>Editor\Noesis.NoesisGUI.Editor.asmdef</Link>
     </None>
   </ItemGroup>
@@ -788,31 +788,26 @@
     <Reference Include="System.Xml.XPath.XDocument">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2022.2.1f1\Editor\Data\UnityReferenceAssemblies\unity-4.8-api\Facades\System.Xml.XPath.XDocument.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.InputSystem">
+      <HintPath>Library\ScriptAssemblies\Unity.InputSystem.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.UI">
+      <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.TestRunner">
+      <HintPath>Library\ScriptAssemblies\UnityEditor.TestRunner.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TestRunner">
+      <HintPath>Library\ScriptAssemblies\UnityEngine.TestRunner.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Noesis.NoesisGUI.csproj">
       <Project>{35A02700-358A-92F4-4A2F-02C500AED2CF}</Project>
       <Name>Noesis.NoesisGUI</Name>
-    </ProjectReference>
-    <ProjectReference Include="Unity.InputSystem.csproj">
-      <Project>{D05BAE90-58D4-28B2-6E3A-5A9AAA5BCA68}</Project>
-      <Name>Unity.InputSystem</Name>
-    </ProjectReference>
-    <ProjectReference Include="UnityEditor.UI.csproj">
-      <Project>{B5157525-475B-B64E-3B08-3AC54D41D3BB}</Project>
-      <Name>UnityEditor.UI</Name>
-    </ProjectReference>
-    <ProjectReference Include="UnityEngine.UI.csproj">
-      <Project>{D6BA7015-DBDD-3A78-8FF8-719CF96ED26F}</Project>
-      <Name>UnityEngine.UI</Name>
-    </ProjectReference>
-    <ProjectReference Include="UnityEditor.TestRunner.csproj">
-      <Project>{AC9ABD39-9E15-165C-6831-97C66E6A6FC9}</Project>
-      <Name>UnityEditor.TestRunner</Name>
-    </ProjectReference>
-    <ProjectReference Include="UnityEngine.TestRunner.csproj">
-      <Project>{D0EAFB0B-853C-BFEE-BF48-5ECF79CFE479}</Project>
-      <Name>UnityEngine.TestRunner</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
