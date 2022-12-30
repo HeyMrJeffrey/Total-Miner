@@ -27,4 +27,20 @@ public static class Noise
         else
             return false;
     }
+
+    public static float Get3DPerlinNoiseValue(Vector3 position)
+    {
+        float x = position.x;
+        float y = position.y;
+        float z = position.z;
+
+        float AB = Mathf.PerlinNoise(x, y);
+        float BC = Mathf.PerlinNoise(y, z);
+        float AC = Mathf.PerlinNoise(x, z);
+        float BA = Mathf.PerlinNoise(y, x);
+        float CB = Mathf.PerlinNoise(z, y);
+        float CA = Mathf.PerlinNoise(z, x);
+
+        return (AB + BC + AC + BA + CB + CA) / 6f;
+    }
 }

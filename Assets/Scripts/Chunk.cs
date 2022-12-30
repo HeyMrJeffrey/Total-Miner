@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Assertions;
+using static BlockType;
 
 public class Chunk
 {
@@ -96,6 +97,14 @@ public class Chunk
         coord = _coord;
         world = _world;
 
+        //Get the modifications
+        //if (world.modifications.ContainsKey(this.coord))
+        //{
+        //    for (int i = 0; i < world.modifications[this.coord].Count; i++)
+        //        this.modifications.Enqueue(world.modifications[this.coord].Dequeue());
+        //    world.modifications.Remove(this.coord);
+        //}
+
         SetChunkFlag(eChunkFlags.CREATED);
         ClearChunkFlag(eChunkFlags.CREATING);
 
@@ -149,6 +158,7 @@ public class Chunk
                 {
                     voxelMap[x, y, z] = world.GetVoxel(new Vector3(x, y, z) + positionToUse);
                 }
+
             }
         }
         ClearChunkFlag(eChunkFlags.GENERATING);
@@ -264,7 +274,7 @@ public class Chunk
     }
 
     // position - coordinate of the voxel
-    bool CheckVoxel(Vector3 pos, Chunk.chunkUpdateThreadData threadedData = default)
+    bool CheckVoxelTransparency(Vector3 pos, Chunk.chunkUpdateThreadData threadedData = default)
     {
         if (threadedData.Valid)
         {
@@ -291,6 +301,34 @@ public class Chunk
         return world.blockTypes[voxelMap[x, y, z]].isTransparent;
     }
 
+    // position - coordinate of the voxel
+    bool CheckVoxelStandard(Vector3 pos, Chunk.chunkUpdateThreadData threadedData = default)
+    {
+        if (threadedData.Valid)
+        {
+
+        }
+        // Always round down to int. 
+        // Hardcasting, (int)position, can cause issues.
+        int x = Mathf.FloorToInt(pos.x);
+        int y = Mathf.FloorToInt(pos.y);
+        int z = Mathf.FloorToInt(pos.z);
+
+        if (!IsVoxelInChunk(x, y, z))
+        {
+            if (threadedData.Valid)
+            {
+                return world.CheckIfVoxelStandard(pos + threadedData.ChunkPosition, threadedData);
+
+            }
+            else
+                return world.CheckIfVoxelStandard(pos + position);
+
+        }
+
+        return world.blockTypes[voxelMap[x, y, z]].isStandard;
+    }
+
     // use by external scripts
     public byte GetVoxelFromGlobalVector3(Vector3 pos, Chunk.chunkUpdateThreadData threadedData = default)
     {
@@ -308,12 +346,14 @@ public class Chunk
         return targetChunk.voxelMap[xMod, yMod, zMod];
     }
 
+
     // position - coordinate of the voxel
     void UpdateMeshData(Vector3 position, Chunk.chunkUpdateThreadData threadedData = default)
     {
 
         byte blockID = voxelMap[(int)position.x, (int)position.y, (int)position.z];
-        bool isTransparent = world.blockTypes[blockID].isTransparent;
+        BlockType currentBlock = world.blockTypes[blockID];
+        bool isTransparent = currentBlock.isTransparent;
 
         // Loop through each face (6 faces per block)
         for (int currentFace = 0; currentFace < 6; currentFace++)
@@ -322,46 +362,34 @@ public class Chunk
             // Otherwise this face is exposed, draw it
 
             Vector3 nextVoxelToCheck = position + VoxelData.checkFaces[currentFace];
-            if (CheckVoxel(nextVoxelToCheck, threadedData))
+            if (CheckVoxelTransparency(nextVoxelToCheck, threadedData) || !CheckVoxelStandard(nextVoxelToCheck, threadedData))
             {
-                // Populate the four corners of the face of the block.
-                vertices.Add(position + VoxelData.voxelVertices[VoxelData.voxelTriangles[currentFace, 0]]);
-                vertices.Add(position + VoxelData.voxelVertices[VoxelData.voxelTriangles[currentFace, 1]]);
-                vertices.Add(position + VoxelData.voxelVertices[VoxelData.voxelTriangles[currentFace, 2]]);
-                vertices.Add(position + VoxelData.voxelVertices[VoxelData.voxelTriangles[currentFace, 3]]);
-                // Calculate the normals
-                // Normals determine direction of a face
-                for (int i = 0; i < 4; i++)
+                int faceVertCount = 0;
+
+                for (int i = 0; i < currentBlock.meshData.faces[currentFace].vertData.Length; i++)
                 {
-                    normals.Add(VoxelData.checkFaces[currentFace]);
+                    vertices.Add(position + currentBlock.meshData.faces[currentFace].vertData[i].position);
+                    normals.Add(currentBlock.meshData.faces[currentFace].normal);
+                    AddTexture(currentBlock.GetTextureID(currentFace), currentBlock.meshData.faces[currentFace].vertData[i].uv);
+                    faceVertCount++;
                 }
-
-                AddTexture(world.blockTypes[blockID].GetTextureID(currentFace));
-
 
                 if (!isTransparent)
                 {
-                    // Populate the six vertices to draw the 2 triangles
-                    // Two vertices must overlap to get a crisp edge
-                    triangles.Add(vertexIndex + 0);
-                    triangles.Add(vertexIndex + 1);
-                    triangles.Add(vertexIndex + 2);
-                    triangles.Add(vertexIndex + 2);
-                    triangles.Add(vertexIndex + 1);
-                    triangles.Add(vertexIndex + 3);
+                    for (int i = 0; i < currentBlock.meshData.faces[currentFace].triangles.Length; i++)
+                    {
+                        triangles.Add(vertexIndex + currentBlock.meshData.faces[currentFace].triangles[i]);
+                    }
                 }
                 else
                 {
-                    transparentTriangles.Add(vertexIndex + 0);
-                    transparentTriangles.Add(vertexIndex + 1);
-                    transparentTriangles.Add(vertexIndex + 2);
-                    transparentTriangles.Add(vertexIndex + 2);
-                    transparentTriangles.Add(vertexIndex + 1);
-                    transparentTriangles.Add(vertexIndex + 3);
+                    for (int i = 0; i < currentBlock.meshData.faces[currentFace].triangles.Length; i++)
+                    {
+                        transparentTriangles.Add(vertexIndex + currentBlock.meshData.faces[currentFace].triangles[i]);
+                    }
                 }
 
-                // Increment the vertex index
-                vertexIndex += 4;
+                vertexIndex += faceVertCount;
             }
         }
     }
@@ -467,7 +495,7 @@ public class Chunk
 
     // textureID - where a texture occurs in the atlas
     // NOT BLOCK ID - blocks like Grass/Wood have different texture depending on face.
-    void AddTexture(int textureID)
+    void AddTexture(int textureID, Vector2 uv)
     {
         float y = textureID / VoxelData.textureAtlasSizeInBlocks;
         float x = textureID - (y * VoxelData.textureAtlasSizeInBlocks);
@@ -477,10 +505,14 @@ public class Chunk
         //If texture atlas start from top left
         y = 1f - y - VoxelData.NormalizedBlockTextureSize;
 
+        x += VoxelData.NormalizedBlockTextureSize * uv.x;
+        y += VoxelData.NormalizedBlockTextureSize * uv.y;
+
         uvs.Add(new Vector2(x, y));
-        uvs.Add(new Vector2(x, y + VoxelData.NormalizedBlockTextureSize));
-        uvs.Add(new Vector2(x + VoxelData.NormalizedBlockTextureSize, y));
-        uvs.Add(new Vector2(x + VoxelData.NormalizedBlockTextureSize, y + VoxelData.NormalizedBlockTextureSize));
+        //uvs.Add(new Vector2(x, y));
+        //uvs.Add(new Vector2(x, y + VoxelData.NormalizedBlockTextureSize));
+        //uvs.Add(new Vector2(x + VoxelData.NormalizedBlockTextureSize, y));
+        //uvs.Add(new Vector2(x + VoxelData.NormalizedBlockTextureSize, y + VoxelData.NormalizedBlockTextureSize));
     }
 }
 
