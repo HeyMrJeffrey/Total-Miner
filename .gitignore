@@ -95,3 +95,8 @@ bld/
 [Ll]ogs/
 
 /Packages
+
+*.csproj
+*.csproj.user
+*.sln
+UserSettings/
