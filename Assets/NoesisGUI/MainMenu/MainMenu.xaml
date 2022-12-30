@@ -9,7 +9,7 @@
     xmlns:local="clr-namespace:TotalMinerUnity.Menus"
     d:DataContext="{d:DesignInstance Type=local:ViewModel}"
     mc:Ignorable="d"
-    x:Name="MainMenu_MainMenuControl"
+    x:Name="userControl"
     MinWidth="256" MinHeight="144"
     d:DesignWidth="1920" d:DesignHeight="1080">
 
@@ -34,10 +34,10 @@
     
     <b:Interaction.Triggers>
         <b:DataTrigger Binding="{Binding State}" Comparison="Equal" Value="{x:Static local:State.Main}">
-            <b:ChangePropertyAction PropertyName="Visibility" TargetName="MainMenu_MainMenuControl" Value="Visible"/>
+            <b:ChangePropertyAction PropertyName="Visibility" TargetName="userControl" Value="Visible"/>
         </b:DataTrigger>
         <b:DataTrigger Binding="{Binding State}" Comparison="NotEqual" Value="{x:Static local:State.Main}">
-            <b:ChangePropertyAction PropertyName="Visibility" TargetName="MainMenu_MainMenuControl" Value="Hidden"/>
+            <b:ChangePropertyAction PropertyName="Visibility" TargetName="userControl" Value="Hidden"/>
         </b:DataTrigger>
         <b:KeyTrigger Key="H">
             <b:InvokeCommandAction Command="{Binding Exit}"/>
@@ -46,14 +46,39 @@
 
     <Grid MinWidth="256" MinHeight="144">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3.3*"/>
-            <ColumnDefinition Width="6.6*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="6*"/>
+            <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
         
         <Rectangle Grid.Column="0" Stroke="Black" Margin="10,10,0,10"/>
-        <Rectangle Grid.Column="1" Stroke="Black" Margin="0,10,10,10"/>
+        <Rectangle Grid.Column="1" Stroke="Black" Margin="0,10,0,10"/>
+        <Rectangle Grid.Column="2" Stroke="Black" Margin="0,10,10,10"/>
         <Viewbox Grid.Column="0" Margin="10,10,0,10">
-            <ListBox Height="144" Width="76" Margin="6,6,6,28" Focusable="False">
+            <Grid>
+                <Grid.Resources>
+                    <ImageSource x:Key="BorderBottom">..\Images\border\bottom.png</ImageSource>
+                    <ImageSource x:Key="BorderBottomLeft">..\Images\border\bottomleft.png</ImageSource>
+                    <ImageSource x:Key="BorderBottomRight">..\Images\border\bottomright.png</ImageSource>
+                    <ImageSource x:Key="BorderLeft">..\Images\border\left.png</ImageSource>
+                    <ImageSource x:Key="BorderRight">..\Images\border\right.png</ImageSource>
+                    <ImageSource x:Key="BorderTop">..\Images\border\top.png</ImageSource>
+                    <ImageSource x:Key="BorderTopLeft">..\Images\border\topleft.png</ImageSource>
+                    <ImageSource x:Key="BorderTopRight">..\Images\border\topright.png</ImageSource>
+                </Grid.Resources>
+                <Grid.Background>
+                    <ImageBrush TileMode="Tile" Viewport="0,0,48,29" ViewportUnits="Absolute" ImageSource="{StaticResource BorderTop}" />
+                </Grid.Background>
+            </Grid>
+        </Viewbox>
+        <Viewbox Grid.Column="1" Margin="10,10,0,10">
+
+            <Grid>
+                
+
+
+                <ListBox Height="144" Width="76" Margin="6,6,6,28" Focusable="False" Background="#FF333333">
+                    
                 
 
                 <ListBox.ItemsPanel>
@@ -66,12 +91,12 @@
 
                 <ListBoxItem Height="12" Padding="0,0,0,0" Visibility="Hidden" Focusable="False" Style="{DynamicResource ListBoxItemStyle1}">
                     <Viewbox Height="10" Width="76">
-                        <Button Content="Continue" Padding="0,0,0,0" BorderThickness="0" BorderBrush="{x:Null}" Width="368" FontSize="36" Style="{DynamicResource Style.ToolBar.Button}"/>
+                        <Button Content="Continue" Padding="0,0,0,0" BorderThickness="0" Width="368" FontSize="36" Style="{DynamicResource Style.ToolBar.Button}"/>
                     </Viewbox>
                 </ListBoxItem>
                 <ListBoxItem Height="12" Padding="0,0,0,0" Visibility="Hidden" Focusable="False" Style="{DynamicResource ListBoxItemStyle1}">
                     <Viewbox Height="10" Width="76">
-                        <Button Content="Load Game" Padding="0,0,0,0" BorderThickness="0" BorderBrush="{x:Null}" Width="368" FontSize="36" Style="{DynamicResource Style.ToolBar.Button}">
+                        <Button Content="Load Game" Padding="0,0,0,0" BorderThickness="0" Width="368" FontSize="36" Style="{DynamicResource Style.ToolBar.Button}">
 
                             <Button.Effect>
                                 <DropShadowEffect BlurRadius="5" ShadowDepth="3" />
@@ -81,21 +106,22 @@
                 </ListBoxItem>
                 <ListBoxItem Height="12" Padding="0,0,0,0" Focusable="False" Style="{DynamicResource ListBoxItemStyle1}">
                     <Viewbox Height="10" Width="76">
-                        <Button Content="New Game" Command="{Binding Start}" Padding="0,0,0,0" BorderThickness="0" BorderBrush="{x:Null}" Width="368" FontSize="36" Style="{DynamicResource Style.ToolBar.Button}"/>
+                        <Button Content="New Game" Command="{Binding Start}" Padding="0,0,0,0" BorderThickness="0" Width="368" FontSize="36" Style="{DynamicResource Style.ToolBar.Button}"/>
                     </Viewbox>
                 </ListBoxItem>
                 <ListBoxItem Height="12" Padding="0,0,0,0" Focusable="False" Style="{DynamicResource ListBoxItemStyle1}">
                     <Viewbox Height="10" Width="76">
-                        <Button Content="Settings" Command="{Binding Settings}" Padding="0,0,0,0" BorderThickness="0" BorderBrush="{x:Null}" Width="368" FontSize="36" Style="{DynamicResource Style.ToolBar.Button}"/>
+                        <Button Content="Settings" Command="{Binding Settings}" Padding="0,0,0,0" BorderThickness="0" Width="368" FontSize="36" Style="{DynamicResource Style.ToolBar.Button}"/>
                     </Viewbox>
                 </ListBoxItem>
                 <ListBoxItem Height="12" Padding="0,0,0,0" Focusable="False" Style="{DynamicResource ListBoxItemStyle1}">
                     <Viewbox Height="10" Width="76">
-                        <Button Content="Exit" Command="{Binding Exit}" Padding="0,0,0,0" BorderThickness="0" BorderBrush="{x:Null}" Width="368" FontSize="36" Style="{DynamicResource Style.ToolBar.Button}"/>
+                        <Button Content="Exit" Command="{Binding Exit}" Padding="0,0,0,0" BorderThickness="0" Width="368" FontSize="36" Style="{DynamicResource Style.ToolBar.Button}"/>
                     </Viewbox>
                 </ListBoxItem>
 
             </ListBox>
+            </Grid>
         </Viewbox>
         <!--<Button Content="Button" Margin="300,200,300,195" MinWidth="50" MinHeight="30" av:IsHidden="True"/>-->
     </Grid>

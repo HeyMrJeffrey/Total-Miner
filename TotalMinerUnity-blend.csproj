@@ -101,5 +101,18 @@
   <ItemGroup>
     <Resource Include="Assets\NoesisGUI\MainMenu\DesignBackground.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\NoesisGUI\MainMenu\logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\NoesisGUI\Images\border\bottom.png" />
+    <Resource Include="Assets\NoesisGUI\Images\border\bottomleft.png" />
+    <Resource Include="Assets\NoesisGUI\Images\border\bottomright.png" />
+    <Resource Include="Assets\NoesisGUI\Images\border\left.png" />
+    <Resource Include="Assets\NoesisGUI\Images\border\right.png" />
+    <Resource Include="Assets\NoesisGUI\Images\border\top.png" />
+    <Resource Include="Assets\NoesisGUI\Images\border\topleft.png" />
+    <Resource Include="Assets\NoesisGUI\Images\border\topright.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

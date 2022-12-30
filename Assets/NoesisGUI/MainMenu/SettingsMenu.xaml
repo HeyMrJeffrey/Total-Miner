@@ -8,7 +8,7 @@
     xmlns:local="clr-namespace:TotalMinerUnity.Menus"
     d:DataContext="{d:DesignInstance Type=local:ViewModel}"
     mc:Ignorable="d"
-    x:Name="MainMenu_SettingMenuControl"
+    x:Name="userControl"
     d:DesignWidth="1920" d:DesignHeight="1080"
     MinWidth="256" MinHeight="144">
 
@@ -17,10 +17,10 @@
 
     <b:Interaction.Triggers>
         <b:DataTrigger Binding="{Binding State}" Comparison="Equal" Value="{x:Static local:State.Settings}">
-            <b:ChangePropertyAction PropertyName="Visibility" TargetName="MainMenu_SettingMenuControl" Value="Visible"/>
+            <b:ChangePropertyAction PropertyName="Visibility" TargetName="userControl" Value="Visible"/>
         </b:DataTrigger>
         <b:DataTrigger Binding="{Binding State}" Comparison="NotEqual" Value="{x:Static local:State.Settings}">
-            <b:ChangePropertyAction PropertyName="Visibility" TargetName="MainMenu_SettingMenuControl" Value="Hidden"/>
+            <b:ChangePropertyAction PropertyName="Visibility" TargetName="userControl" Value="Hidden"/>
         </b:DataTrigger>
     </b:Interaction.Triggers>
 

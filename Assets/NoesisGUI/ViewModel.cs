@@ -39,25 +39,12 @@ namespace TotalMinerUnity.Menus
         public ICommand Exit { get; private set; }
         public ICommand Back { get; private set; }
 
-        public ViewModel()
-        {
-            Start = new DelegateCommand(OnStart);
-            Settings = new DelegateCommand(OnSettings);
-            Exit = new DelegateCommand(OnExit);
-            Back = new DelegateCommand(OnBack);
-            ChangeBackground1 = new DelegateCommand(OnChangeBackground1);
-            ChangeBackground2 = new DelegateCommand(OnChangeBackground2);
-
-            State = State.Main;
-
-        }
-
-        public string Platform { get { return "PC"; } }
+        public string Platform { get => "PC"; }
 
         private State _state;
         public State State
         {
-            get { return _state; }
+            get => _state;
             set
             {
                 if (_state != value)
@@ -72,32 +59,31 @@ namespace TotalMinerUnity.Menus
 #if NOESIS
         private Queue<Texture2D> MainMenuBackgroundInUse = new Queue<Texture2D>();
 #endif
-        public ImageSource BackgroundImage1
+        public ImageSource BackgroundImage1 { get => GetNextBackgroundImage(); }
+        public ImageSource BackgroundImage2 { get => GetNextBackgroundImage(); }
+
+
+
+        public ViewModel()
         {
-            get
-            {
-#if NOESIS
-                Texture2D texture = Globals.MainMenuBackgrounds.Dequeue();
-                MainMenuBackgroundInUse.Enqueue(texture);
+            Start = new DelegateCommand(OnStart);
+            Settings = new DelegateCommand(OnSettings);
+            Exit = new DelegateCommand(OnExit);
+            Back = new DelegateCommand(OnBack);
+            ChangeBackground1 = new DelegateCommand(OnChangeBackground1);
+            ChangeBackground2 = new DelegateCommand(OnChangeBackground2);
 
-                if(MainMenuBackgroundInUse.Count > 2)
-                    Resources.UnloadAsset(MainMenuBackgroundInUse.Dequeue());
+            State = State.Main;
 
-                return new TextureSource(texture);
-
-#else
-                return default;
-#endif
-            }
         }
 
-
-
-        public ImageSource BackgroundImage2
+        
+        private ImageSource GetNextBackgroundImage()
         {
-            get 
-            {
 #if NOESIS
+
+            if (Globals.MainMenuBackgrounds.Count != 0)
+            {
                 Texture2D texture = Globals.MainMenuBackgrounds.Dequeue();
                 MainMenuBackgroundInUse.Enqueue(texture);
 
@@ -105,11 +91,10 @@ namespace TotalMinerUnity.Menus
                     Resources.UnloadAsset(MainMenuBackgroundInUse.Dequeue());
 
                 return new TextureSource(texture);
-
-#else
-                return default;
-#endif
             }
+#endif
+            return default;
+
         }
 
         public void OnPropertyChanged(string name)

@@ -73,13 +73,19 @@
 
         <Grid.Resources>
             <ImageSource x:Key="DesignImage">DesignBackground.png</ImageSource>
+            <ImageSource x:Key="Logo">logo.png</ImageSource>
         </Grid.Resources>
 
+        
         <Viewbox Stretch="UniformToFill">
             <Grid>
                 <Image x:Name="background1" Source="{Binding BackgroundImage1}" d:Source="{StaticResource DesignImage}" Panel.ZIndex="2" />
                 <Image x:Name="background2" Source="{Binding BackgroundImage2}" Panel.ZIndex="1"/>
+                
             </Grid>
+        </Viewbox>
+        <Viewbox Panel.ZIndex="4" >
+            <Image Source="{StaticResource Logo}" Margin="200,0,200,300"  />
         </Viewbox>
 
         <local:MainMenu/>
