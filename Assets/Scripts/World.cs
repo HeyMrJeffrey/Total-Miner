@@ -171,11 +171,8 @@ public class World : MonoBehaviour
         if (!Multithreading)
         {
             StartCoroutine(ApplyModifications());
-        }
-
-        if (chunksToUpdate.Count > 0 && !Multithreading)
-        {
-            UpdateChunks();
+            if (chunksToUpdate.Count > 0)
+                UpdateChunks();
         }
 
         if (Input.GetKeyDown(KeyCode.Tab))
@@ -254,38 +251,29 @@ public class World : MonoBehaviour
         {
             ChunkCoord coord = chunksToCreate[0];
             chunksToCreate.RemoveAt(0);
+
             if (chunkMap[coord.x, coord.z] == null)
-            {
                 chunkMap[coord.x, coord.z] = new Chunk(coord, this, false);
-            }
 
             if (!chunkMap[coord.x, coord.z].IsInitializing && !chunkMap[coord.x, coord.z].IsInitialized)
                 chunkMap[coord.x, coord.z].Init(false, false);
 
-
-            if (Multithreading)
-                AddChunkToUpdateList(chunkMap[coord.x, coord.z]);
-            else
-            {
-                if (!chunksToUpdate.Contains(chunkMap[coord.x, coord.z]))
-                    chunksToUpdate.Add(chunkMap[coord.x, coord.z]);
-            }
+            AddChunkToUpdateList(chunkMap[coord.x, coord.z]);
         }
     }
     void UpdateChunks()
     {
         Assert.IsTrue(!Multithreading, "UpdateChunks cannot be called if multithreading is active.");
 
-        bool updated = false;
-        int index = 0;
-        while (!updated && index < chunksToUpdate.Count)
+        int maxToUpdate = Math.Min(chunksToUpdate.Count, 1);
+        int numUpdated = 0;
+        while (numUpdated < maxToUpdate && chunksToUpdate.Count > 0)
         {
-            if (!chunksToUpdate[index].IsGenerated && !chunksToUpdate[index].IsGenerating)
-                chunksToUpdate[index].PopulateVoxelMap();
-            chunksToUpdate[index].UpdateChunk();
-            chunksToUpdate.RemoveAt(index);
-            updated = true;
-
+            if (!chunksToUpdate[0].IsGenerated)
+                chunksToUpdate[0].PopulateVoxelMap();
+            chunksToUpdate[0].UpdateChunk();
+            chunksToUpdate.RemoveAt(0);
+            numUpdated++;
         }
     }
     public void UpdateChunksThreaded()
@@ -371,6 +359,7 @@ public class World : MonoBehaviour
 
     IEnumerator ApplyModifications()
     {
+        Assert.IsTrue(!Multithreading, "ApplyModifications cannot be called if multithreading is active");
         int count = 0;
         while (modifications.Count > 0)
         {
@@ -763,15 +752,22 @@ public class World : MonoBehaviour
     public bool AddChunkToUpdateList(Chunk chunk)
     {
         bool value = false;
-
-        lock (chunksToUpdateLock)
+        if (!Multithreading)
         {
-            if (chunksToAddToUpdateList.Contains(chunk))
-                value = false;
-            else
+            if (!chunksToUpdate.Contains(chunk))
+                chunksToUpdate.Add(chunk);
+        }
+        else
+        {
+            lock (chunksToUpdateLock)
             {
-                chunksToAddToUpdateList.Add(chunk);
-                value = true;
+                if (chunksToAddToUpdateList.Contains(chunk))
+                    value = false;
+                else
+                {
+                    chunksToAddToUpdateList.Add(chunk);
+                    value = true;
+                }
             }
         }
         return value;
@@ -779,14 +775,29 @@ public class World : MonoBehaviour
     public int AddChunksToUpdateList(IEnumerable<Chunk> chunks)
     {
         int toRet = 0;
-        lock (chunksToUpdateLock)
+        if (!Multithreading)
         {
             foreach (var chunk in chunks)
             {
-                if (!chunksToAddToUpdateList.Contains(chunk))
+                if (!chunksToUpdate.Contains(chunk))
                 {
-                    chunksToAddToUpdateList.Add(chunk);
+                    chunksToUpdate.Add(chunk);
                     toRet++;
+                }
+            }
+
+        }
+        else
+        {
+            lock (chunksToUpdateLock)
+            {
+                foreach (var chunk in chunks)
+                {
+                    if (!chunksToAddToUpdateList.Contains(chunk))
+                    {
+                        chunksToAddToUpdateList.Add(chunk);
+                        toRet++;
+                    }
                 }
             }
         }
