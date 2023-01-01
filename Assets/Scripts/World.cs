@@ -170,7 +170,7 @@ public class World : MonoBehaviour
 
         if (!Multithreading)
         {
-           // StartCoroutine(ApplyModifications());
+            StartCoroutine(ApplyModifications());
         }
 
         if (chunksToUpdate.Count > 0 && !Multithreading)
@@ -255,10 +255,21 @@ public class World : MonoBehaviour
             ChunkCoord coord = chunksToCreate[0];
             chunksToCreate.RemoveAt(0);
             if (chunkMap[coord.x, coord.z] == null)
+            {
                 chunkMap[coord.x, coord.z] = new Chunk(coord, this, false);
-            if (!chunkMap[coord.x, coord.z].IsInitialized && !chunkMap[coord.x, coord.z].IsInitializing)
-                chunkMap[coord.x, coord.z].Init(false, false); //We're not going to populate or update it here.  That will be handled in the multithreading code.
-            AddChunkToUpdateList(chunkMap[coord.x, coord.z]);
+            }
+
+            if (!chunkMap[coord.x, coord.z].IsInitializing && !chunkMap[coord.x, coord.z].IsInitialized)
+                chunkMap[coord.x, coord.z].Init(false, false);
+
+
+            if (Multithreading)
+                AddChunkToUpdateList(chunkMap[coord.x, coord.z]);
+            else
+            {
+                if (!chunksToUpdate.Contains(chunkMap[coord.x, coord.z]))
+                    chunksToUpdate.Add(chunkMap[coord.x, coord.z]);
+            }
         }
     }
     void UpdateChunks()
@@ -267,18 +278,14 @@ public class World : MonoBehaviour
 
         bool updated = false;
         int index = 0;
-        while (!updated && index < chunksToUpdate.Count - 1)
+        while (!updated && index < chunksToUpdate.Count)
         {
-            if (chunksToUpdate[index].IsGenerated)
-            {
-                chunksToUpdate[index].UpdateChunk();
-                chunksToUpdate.RemoveAt(index);
-                updated = true;
-            }
-            else
-            {
-                index++;
-            }
+            if (!chunksToUpdate[index].IsGenerated && !chunksToUpdate[index].IsGenerating)
+                chunksToUpdate[index].PopulateVoxelMap();
+            chunksToUpdate[index].UpdateChunk();
+            chunksToUpdate.RemoveAt(index);
+            updated = true;
+
         }
     }
     public void UpdateChunksThreaded()
@@ -365,10 +372,7 @@ public class World : MonoBehaviour
     IEnumerator ApplyModifications()
     {
         int count = 0;
-
-        int modCount = modifications.Count;
-        //this is a problem
-        for (int i = 0; i < modCount; i++)
+        while (modifications.Count > 0)
         {
             var item = modifications.ElementAt(0);
             while (item.Value.Count > 0)
@@ -391,7 +395,8 @@ public class World : MonoBehaviour
                     // Enqueueing into the chunk modifications, not the world modifications
                     chunkMap[coord.x, coord.z].modifications.Enqueue(v);
 
-                    AddChunkToUpdateList(chunkMap[coord.x, coord.z]);
+                    if (!chunksToUpdate.Contains(chunkMap[coord.x, coord.z]))
+                        chunksToUpdate.Add(chunkMap[coord.x, coord.z]);
 
                     count++;
                     // Only 200 voxel modifications per frame
@@ -440,14 +445,10 @@ public class World : MonoBehaviour
                     {
                         chunkMap[x, z] = new Chunk(thisChunkCoord, this, false);
                         chunkMap[x, z].Init(false, false);
-                        chunkMap[x, z].isActive = true;
                         chunksToCreate.Add(thisChunkCoord);
                     }
-                    else
-                    {
-                        chunkMap[x, z].isActive = true;
-                        chunkMap[x, z].SetChunkActive(true);
-                    }
+                    chunkMap[x, z].SetChunkActive(true);
+
                 }
 
                 for (int i = 0; i < previouslyActiveChunks.Count; i++)
@@ -462,7 +463,7 @@ public class World : MonoBehaviour
 
         foreach (ChunkCoord prevCoord in previouslyActiveChunks)
         {
-            chunkMap[prevCoord.x, prevCoord.z].isActive = false;
+            chunkMap[prevCoord.x, prevCoord.z].SetChunkActive(false);
         }
     }
     /// TODO: Need to prevent reference exception errors if player ends up outside world space.
