@@ -59,7 +59,7 @@ public class World : MonoBehaviour
 
     public void Init()
     {
-        Multithreading = true;
+        Multithreading = false;
 
         biomes = new BiomeAttributes[]
         {
@@ -127,7 +127,7 @@ public class World : MonoBehaviour
 
 
         /* IF MULTUITHREAD IS TRUE THEN ApplyModifications CANNOT BE RUN */
-        Multithreading = true;
+        Multithreading = false;
 
         string jsonImport = File.ReadAllText(Application.dataPath + "/settings.cfg");
         settings = JsonUtility.FromJson<Settings>(jsonImport);
@@ -170,7 +170,7 @@ public class World : MonoBehaviour
 
         if (!Multithreading)
         {
-            StartCoroutine(ApplyModifications());
+           // StartCoroutine(ApplyModifications());
         }
 
         if (chunksToUpdate.Count > 0 && !Multithreading)
@@ -360,15 +360,18 @@ public class World : MonoBehaviour
             // reset.Set();
         }
     }
+
+
     IEnumerator ApplyModifications()
     {
         int count = 0;
 
         int modCount = modifications.Count;
+        //this is a problem
         for (int i = 0; i < modCount; i++)
         {
             var item = modifications.ElementAt(0);
-            while (modifications.Count > 0)
+            while (item.Value.Count > 0)
             {
                 VoxelMod v = item.Value.Dequeue();
                 ChunkCoord coord = GetChunkCoordFromVector3(v.position);
@@ -828,7 +831,7 @@ public class BlockType
         rightFaceTexture = texNum;
         this.icon = icon;
         this.meshData = VoxelMeshBuilder.GenerateBlockMesh(meshData);
-        this.isStandard = isStandard;   
+        this.isStandard = isStandard;
     }
 
     public BlockType(string name, Sprite icon, int texNumTop, int texNumBottom, int texNumLeft, int texNumRight, int texNumFront, int texNumBack, bool isTransparent = false, bool isSolid = true, eBlockMeshTypes meshData = eBlockMeshTypes.STANDARD_BLOCK, bool isStandard = true)

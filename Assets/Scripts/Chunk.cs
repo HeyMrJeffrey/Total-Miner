@@ -519,7 +519,7 @@ public class Chunk
 // The position of chunk we are drawing
 // Not 0,16,32...
 // BUt 0,1,2... 
-public class ChunkCoord
+public class ChunkCoord : IEquatable<ChunkCoord>
 {
     public int x;
     public int z;
@@ -545,6 +545,19 @@ public class ChunkCoord
         z = zCheck / VoxelData.ChunkWidth;
     }
 
+    public override bool Equals(object obj)
+    {
+        if (obj is ChunkCoord compareTo)
+        {
+            if (compareTo.x == this.x && compareTo.z == this.z)
+                return true;
+        }
+        return false;
+    }
+    public override int GetHashCode()
+    {
+        return x.GetHashCode() ^ z.GetHashCode();
+    }
     public bool Equals(ChunkCoord coordToCompare)
     {
         if (coordToCompare == null)
