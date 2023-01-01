@@ -44,7 +44,6 @@
             </Int32AnimationUsingKeyFrames>
         </Storyboard>
 
-
     </UserControl.Resources>
 
 
@@ -84,8 +83,8 @@
                 
             </Grid>
         </Viewbox>
-        <Viewbox Panel.ZIndex="4" >
-            <Image Source="{StaticResource Logo}" Margin="200,0,200,300"  />
+        <Viewbox Panel.ZIndex="4" VerticalAlignment="Bottom" HorizontalAlignment="Right" >
+            <Image Source="{StaticResource Logo}" Margin="0,1100,100,100"   />
         </Viewbox>
 
         <local:MainMenu/>
